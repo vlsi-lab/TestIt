@@ -20,16 +20,14 @@
                                          # IMPORTANT: This format has to be consistent with the serial output 
                                          #            software application.
     outputTags: ["ID", "Cycles", "Outcome"]
-    usbPort: None # Leave to none for simulation targets
-    baudrate: 9600 # Set to 0 for simulation targets
+    usbPort: None # For FPGA targets
+    baudrate: 9600 # For FPGA targets
     iterations: 100 # Set the number of iterations of the verification campaign
-  }
-  
-  gui: {
-    enable: true
+    outputFile: "path/to/output/dir/file.log" # Directory to the UART log of the simulation
   }
 
   report: {
+    dir: "path/to/report/dir" # Insert the directory for the dumped report
     includeExecutionTimeStats: true
     includeResults: true
     includeStatisticalAnalysis: true
@@ -65,11 +63,12 @@
 
       outputDataset: {
         name: "output1"
+        dataType
         # The size of the output dataset is automatically computed by the golden result function
       }
 
       goldenResultFunction: {
-        name: "exampleFunction" # One of the .py from the "lib" folder
+        name: "exampleFunction" # It must be included in the verifit_golden.py that must be present in the root of the target folder
         dataType: "int"
       }
     }

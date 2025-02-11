@@ -4,8 +4,7 @@
 #
 # Author: Tommaso Terzano <tommaso.terzano@polito.it> 
 #                         <tommaso.terzano@gmail.com>
-#  
-# Info: Python library of VerifIt. It contains all the necessary functions to run a verification campaign.
+#   functions to run a verification campaign.
 
 import subprocess
 import re
@@ -19,14 +18,12 @@ import os
 import importlib
 import json
 
+# Info: Python library of VerifIt. It   all the necessary
 # Set this to True to enable debugging prints
 DEBUG_MODE = False
 
 # Define the name of the internal result database
 DB_FILE = "test_results.json"
-
-# Current directory
-current_directory = os.getcwd()
 
 def PRINT_DEB(*args, **kwargs):
     if DEBUG_MODE:
@@ -54,20 +51,34 @@ class VerifIt:
 
     # Synthesis & Simulation methods
     
-    # Either build the sim model or synth for the FPGA board
-    def build_model(self):
+    # Build the model for either the simulation tool or the FPGA board
+    def build_model(self, flag_synth=True):
         if self.cfg['target']['type'] == "fpga":
-          cmd = f"cd ../ ; make fpga-synth board={self.cfg['target']['name']}"
-          subprocess.run(cmd, shell=True, capture_output=True, text=True)
-          if ("ERROR" in cmd.stderr) or ("ERROR" in cmd.stderr):
-              print(cmd.stderr)
-              exit(1)
+          if flag_synth:
+            cmd = f"make fpga-build board={self.cfg['target']['name']}"
+            subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            if ("ERROR" in cmd.stderr) or ("ERROR" in cmd.stderr):
+                print(cmd.stderr)
+                return False
+            else:
+                return True
         else:
-          cmd = f"cd ../ ; make sim-synth tool={self.cfg['target']['name']}"
+          cmd = f"make sim-build tool={self.cfg['target']['name']}"
           subprocess.run(cmd, shell=True, capture_output=True, text=True)
           if ("ERROR" in cmd.stderr) or ("ERROR" in cmd.stderr):
               print(cmd.stderr)
-              exit(1)
+              return False
+          else:
+              return True
+    
+    def load_fpga_model(self):
+        cmd = f"make fpga-load board={self.cfg['target']['name']}"
+        subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        if ("ERROR" in cmd.stderr) or ("ERROR" in cmd.stderr):
+            print(cmd.stderr)
+            return False
+        else:
+            return True
   
     # FPGA interface methods
     
@@ -124,63 +135,95 @@ class VerifIt:
     # It's possible to print additional information for debugging purpouses.
     # The pattern indicated the expected output pattern to receive via GDB.
     # If the application times out, the verification campaign is interrupted.
-    def launch_test(self, app_name, iteration, additional_info="", pattern=r'(\d+):(\d+):(\d+)', output_tags=None, timeout_t=0):
-        PRINT_DEB(f"Running test {app_name}\n{additional_info}")
-
+    def launch_test(self, app_name, iteration, pattern=r'(\d+):(\d+):(\d+)', output_tags=None, timeout_t=0):
         # Set default output ids
         if output_tags is None:
             output_tags = ["ID", "Cycles", "Outcome"]
 
-        # Check that the serial connection is still open, otherwise stop the verification campaign
-        if not self.ser.is_open:
-            print("ERROR: Serial port is not open!")
-            exit(1) 
+        # Test using the FPGA board
+        if self.cfg['target']['type'] == "fpga":
 
-        # Set up the serial communication thread and attach it the serial queue
-        self.serial_thread = threading.Thread(target=_serial_rx_setup, args=(self.ser, self.serial_queue,))
+            # Check that the serial connection is still open, otherwise stop the verification campaign
+            if not self.ser.is_open:
+                print("ERROR: Serial port is not open!")
+                exit(1) 
 
-        # Start the serial thread
-        self.serial_thread.start()
+            # Set up the serial communication thread and attach it the serial queue
+            self.serial_thread = threading.Thread(target=_serial_rx_setup, args=(self.ser, self.serial_queue,))
 
-        # Compile the application
-        app_compile_cmd = f"cd {current_directory}/../ ; make sw app={app_name}"
+            # Start the serial thread
+            self.serial_thread.start()
+
+            # Compile the application
+            app_compile_cmd = f"make sw app={app_name}"
+            
+            result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
+
+            if ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr):
+                print(result_compilation.stderr)
+                return
+            else:
+                PRINT_DEB("Compilation successful!")
+            
+            # Run the testbench with gdb
+            self.gdb.sendline('load')
+            self.gdb.expect('(gdb)')
+
+            try:
+              output = self.gdb.read_nonblocking(size=100, timeout=1)
+              PRINT_DEB("Current gdb output:", output)
+            except pexpect.TIMEOUT:
+              PRINT_DEB("No new output from GDB.")
+              self.gdb.terminate()
+              return False
+
+            # Set a breakpoint at the exit and wait for it
+            self.gdb.sendline('b _exit')
+            self.gdb.expect('(gdb)')
+            self.gdb.sendline('continue')
+            try:
+              self.gdb.expect('Breakpoint', timeout=timeout_t)
+            except pexpect.TIMEOUT:
+              PRINT_DEB("Timeout reached.")
+              self.gdb.terminate()
+              return False
+            
+            # Wait for serial to finish
+            self.serial_thread.join()
+
+            # Recover the lines
+            lines = []
+            while not self.serial_queue.empty():
+                lines.append(self.serial_queue.get())
         
-        result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
-
-        if ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr):
-            print(result_compilation.stderr)
-            return
+        # Test using the simulation tool
         else:
-            PRINT_DEB("Compilation successful!")
-        
-        # Run the testbench with gdb
-        self.gdb.sendline('load')
-        self.gdb.expect('(gdb)')
+            # Compile the application
+            app_compile_cmd = f"make sw app={app_name}"
+            result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
 
-        try:
-          output = self.gdb.read_nonblocking(size=100, timeout=1)
-          PRINT_DEB("Current gdb output:", output)
-        except pexpect.TIMEOUT:
-          PRINT_DEB("No new output from GDB.")
+            if ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr):
+                print(result_compilation.stderr)
+                return
+            else:
+                PRINT_DEB("Compilation successful!")
 
-        # Set a breakpoint at the exit and wait for it
-        self.gdb.sendline('b _exit')
-        self.gdb.expect('(gdb)')
-        self.gdb.sendline('continue')
-        try:
-          self.gdb.expect('Breakpoint', timeout=timeout_t)
-        except pexpect.TIMEOUT:
-          print("Timeout! Program didn't answer in time, exiting...")
-          self.gdb.terminate()
-          exit(1)
-        
-        # Wait for serial to finish
-        self.serial_thread.join()
+            # Launch the simulation test
+            sim_cmd = f"make sim-run app={app_name}"
+            result_sim = subprocess.run(sim_cmd, shell=True, capture_output=True, text=True)
 
-        # Recover the lines
-        lines = []
-        while not self.serial_queue.empty():
-            lines.append(self.serial_queue.get())
+            if ("ERROR" in result_sim.stderr) or ("Error" in result_sim.stderr):
+                print(result_sim.stderr)
+                return
+            else:
+                PRINT_DEB("Simulation successful!")
+
+            # Read the output file
+            try:
+                with open(f"sw/build/{app_name}.out", 'r') as f:
+                    lines = f.readlines()
+            except FileNotFoundError:
+                return False
 
         # Analyse the results of the test
         pattern = re.compile(pattern)  

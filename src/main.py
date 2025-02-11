@@ -15,7 +15,7 @@ import run
 def main():
     parser = argparse.ArgumentParser(description="VeriFit CLI tool")
     parser.add_argument("command", choices=["run"], help="Command to execute")
-
+#TODO: Add a flag for the run command to specify if the fpga model has already been synthesized
     args = parser.parse_args()
 
     if args.command == "run":
