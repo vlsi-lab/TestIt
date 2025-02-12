@@ -1,0 +1,15 @@
+verifit/
+    src/
+        __init__.py
+        main.py
+        run.py
+        test.py
+        update.py
+        verifit.py
+    templates/
+        config.ver
+        verifit_golden.py
+    LICENSE
+    README.md
+    pyproject.toml
+    setup.py

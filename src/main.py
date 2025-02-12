@@ -9,7 +9,7 @@
 
 import argparse
 import run
-import setup
+import update
 
 def main():
     parser = argparse.ArgumentParser(description="VeriFit CLI tool")
@@ -33,7 +33,7 @@ def main():
     if args.command == "run":
         run.verifit_run(fpga_synthesized=args.synthesized)  # Pass flag to the run function
     elif args.command == "setup":
-        setup.verifit_setup()
+        update.verifit_setup()
 
 if __name__ == "__main__":
     main()
