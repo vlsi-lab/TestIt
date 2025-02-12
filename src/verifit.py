@@ -17,6 +17,7 @@ import random
 import os
 import importlib
 import json
+import numpy as np
 
 # Info: Python library of VerifIt. It   all the necessary
 # Set this to True to enable debugging prints
@@ -52,9 +53,10 @@ class VerifIt:
     # Synthesis & Simulation methods
     
     # Build the model for either the simulation tool or the FPGA board
-    def build_model(self, flag_synth=True):
+    # If the model has already been synthesized, i.e. fpga_synthesized=True, the method will skip the synthesis step
+    def build_model(self, fpga_synthesized=True):
         if self.cfg['target']['type'] == "fpga":
-          if flag_synth:
+          if fpga_synthesized:
             cmd = f"make fpga-build board={self.cfg['target']['name']}"
             subprocess.run(cmd, shell=True, capture_output=True, text=True)
             if ("ERROR" in cmd.stderr) or ("ERROR" in cmd.stderr):
@@ -149,7 +151,7 @@ class VerifIt:
                 exit(1) 
 
             # Set up the serial communication thread and attach it the serial queue
-            self.serial_thread = threading.Thread(target=_serial_rx_setup, args=(self.ser, self.serial_queue,))
+            self.serial_thread = threading.Thread(target=_serial_rx_setup, args=(self.ser, self.serial_queue))
 
             # Start the serial thread
             self.serial_thread.start()
@@ -274,142 +276,178 @@ class VerifIt:
     # (e.g. sizes of the input, number of channels, order of the FIR filter). 
     # It's possible to define which value give to every single parameter (must be inside indicated range)
     # Otherwise, the values will be chosen randomly.
-    def gen_datasets(self):
-      for test in self.cfg.get("test", []):
-          test_dir = test["dir"]
-          os.makedirs(test_dir, exist_ok=True)
+    import os
+import random
+import numpy as np
 
-          # Open files for writing
-          with open(f"{test_dir}/data.h", 'w') as h_file, open(f"{test_dir}/data.c", 'w') as c_file:
-              # Write Header File (data.h)
-              h_file.write("#ifndef DATA_H\n")
-              h_file.write("#define DATA_H\n\n")
-              h_file.write("#include <stdint.h>\n\n")
+def gen_datasets(self):
+    for test in self.cfg.get("test", []):
+        test_dir = test["dir"]
+        os.makedirs(test_dir, exist_ok=True)
 
-              # Iterate through parameters list
-              if "parameters" in test:
-                  for param in test["parameters"]:
-                      param_name = param["name"]
-                      param_value = param["value"]
-                      
-                      # If the value is a list, take a random value from the range
-                      if isinstance(param_value, list):
-                          param_value = random.randint(param_value[0], param_value[1])
-                          param["value"] = param_value
+        # Open files for writing
+        with open(f"{test_dir}/data.h", 'w') as h_file, open(f"{test_dir}/data.c", 'w') as c_file:
+            # Write Header File (data.h)
+            h_file.write("#ifndef DATA_H\n")
+            h_file.write("#define DATA_H\n\n")
+            h_file.write("#include <stdint.h>\n\n")
 
-                      h_file.write(f"#define {param_name} {param_value}\n")
+            # Iterate through parameters list
+            if "parameters" in test:
+                for param in test["parameters"]:
+                    param_name = param["name"]
+                    param_value = param["value"]
 
-              h_file.write("\n")
+                    # If the value is a list, take a random value from the range
+                    if isinstance(param_value, list):
+                        param_value = random.randint(param_value[0], param_value[1])
+                        param["value"] = param_value
 
-              # Iterate through input datasets
-              input_datasets = test.get("inputDataset", [])
+                    h_file.write(f"#define {param_name} {param_value}\n")
 
-              # Make sure input_datasets is a list (it might be a dict if only one exists)
-              if isinstance(input_datasets, dict):
-                  input_datasets = [input_datasets]
+            h_file.write("\n")
 
-              # Begin writing C source file (data.c)
-              c_file.write('#include "data.h"\n\n')
+            # Iterate through input datasets
+            input_datasets = test.get("inputDataset", [])
 
-              # Define input arrays, needed for the computation of the golden results
-              input_arrays = []
+            # Ensure input_datasets is a list (it might be a dict if only one exists)
+            if isinstance(input_datasets, dict):
+                input_datasets = [input_datasets]
 
-              for dataset in input_datasets:
-                  dataset_name = dataset["name"]
-                  datatype = dataset["dataType"]
-                  value_range = dataset["valueRange"]
-                  dimensions = dataset["dimensions"]
+            # Begin writing C source file (data.c)
+            c_file.write('#include "data.h"\n\n')
 
-                  # Calculate dataset size from dimensions
-                  dataset_size = 1
-                  dimension_sizes = []
-                  for dim in dimensions:
-                      if isinstance(dim, str):  # If dimension is parameter-dependent
-                          dim = next((p["value"] for p in test["parameters"] if p["name"] == dim), 1)
-                      dataset_size *= dim
-                      dimension_sizes.append(str(dim))
+            input_arrays = []  # Store NumPy input arrays
 
-                  # Declare dataset in Header File (data.h)
-                  h_file.write(f"extern const {datatype} {dataset_name}[{']['.join(dimension_sizes)}];\n")
+            for dataset in input_datasets:
+                dataset_name = dataset["name"]
+                datatype = dataset["dataType"]
+                value_range = dataset["valueRange"]
+                dimensions = dataset["dimensions"]
 
-                  # Define dataset in Source File (data.c)
-                  c_file.write(f"const {datatype} {dataset_name}[{']['.join(dimension_sizes)}] = " + "{\n")
+                # Convert dimensions to integers (handle parameter references)
+                converted_dimensions = []
+                for dim in dimensions:
+                    if isinstance(dim, str):  # If dimension is parameter-dependent
+                        dim = next((p["value"] for p in test["parameters"] if p["name"] == dim), 1)
+                    converted_dimensions.append(dim)
 
-                  # Determine the first dimension size (N)
-                  first_dim_size = int(dimension_sizes[0]) if dimension_sizes else dataset_size
+                dataset_shape = tuple(converted_dimensions)  # Convert to tuple for NumPy
 
-                  input_array = []
+                # Generate a NumPy array with the correct shape and datatype
+                if datatype == "uint8_t":
+                    input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint8)
+                elif datatype == "uint16_t":
+                    input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint16)
+                elif datatype == "uint32_t":
+                    input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint32)
+                elif datatype == "uint64_t":
+                    input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint64)
+                elif datatype == "int8_t":
+                    input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int8)
+                elif datatype == "int16_t":
+                    input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int16)
+                elif datatype == "int32_t":
+                    input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int32)
+                elif datatype == "int64_t":
+                    input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int64)
+                elif datatype == "float":
+                    input_array = np.random.uniform(value_range[0], value_range[1], size=dataset_shape).astype(np.float32)
+                elif datatype == "double":
+                    input_array = np.random.uniform(value_range[0], value_range[1], size=dataset_shape).astype(np.float64)
+                else:
+                    raise ValueError(f"unsupported datatype '{datatype}'")
 
-                  # Generate the dataset values correctly
-                  for i in range(dataset_size):
-                      if 'float' in datatype:
-                          value = random.uniform(value_range[0], value_range[1])
-                      elif 'uint' in datatype or 'int' in datatype:
-                          value = random.randint(value_range[0], value_range[1])
-                      else:
-                          print(f"ERROR: Unsupported datatype '{datatype}'")
-                          exit(1)
-                      
-                      input_array.append(value)
+                # Append the NumPy array to the list
+                input_arrays.append(input_array)
 
-                      if i < dataset_size - 1:
-                          c_file.write(f" {value},")
-                      else:
-                          c_file.write(f" {value}")
+                # Declare dataset in Header File (data.h)
+                total_size = np.prod(dataset_shape)
+                h_file.write(f"extern const {datatype} {dataset_name}[{total_size}];\n")
 
-                      # Print a new line every N elements (first dimension size)
-                      if (i + 1) % first_dim_size == 0:
-                          c_file.write("\n")
-                  
-                  # Add the generated input array to the list of input arrays
-                  input_arrays.append(input_array)
+                # Define dataset in Source File (data.c)
+                c_file.write(f"const {datatype} {dataset_name}[{total_size}]" + " = {{\n")
 
-                  c_file.write("};\n\n")
+                _write_array(c_file, input_array, dataset_shape)
 
-              # Generate the golden results, based on the golden function
-              golden_function = test["goldenResultFunction"]["name"]
+                c_file.write("};\n\n")
 
-              # The parameters can be used to define aspects of the output
-              golden_results = _dyn_load_func(golden_function, input_arrays, test["parameters"])
-              output_dataset = test.get("outputDataset", [])
+            # Generate the golden results using the golden function
+            golden_function = test["goldenResultFunction"]["name"]
+            try:
+                golden_results = _dyn_load_func(golden_function, input_arrays, test["parameters"])
+            except Exception as e:
+                raise ValueError(f"failed to find golden function '{golden_function}'. Check if it exists in 'functions.py'")
 
-              # Write the golden result
-              for golden_result in golden_results:
-                  output_name = output_dataset["name"]
-                  output_size = len(golden_result)
-                  output_datatype = output_dataset["datatype"]
+            output_dataset = test.get("outputDataset", [])
 
-                  # Declare golden result in Header File (data.h)
-                  h_file.write(f"extern const {output_datatype} {output_name}[{output_size}];\n")
+            # Write the golden result
+            for golden_result in golden_results:
+                output_name = output_dataset["name"]
+                output_shape = golden_result.shape  # Get NumPy shape
+                output_datatype = output_dataset["dataType"]
 
-                  # Define golden result in Source File (data.c)
-                  c_file.write(f"const {output_datatype} {output_name}[{output_size}] = " + "{\n")
+                # Declare golden result in Header File (data.h)
+                total_size = np.prod(output_shape)
+                h_file.write(f"extern const {output_datatype} {output_name}[{total_size}];\n")
 
-                  for i in range(output_size):
-                      if i < output_size - 1:
-                          c_file.write(f" {golden_result[i]},")
-                      else:
-                          c_file.write(f" {golden_result[i]}")
+                # Define golden result in Source File (data.c)
+                c_file.write(f"const {output_datatype} {output_name}[{total_size}]" + " = {{\n")
 
-                      #TODO: Is it possible to set a row size without over complicating stuff?
-                  c_file.write("};\n\n")              
-              
-              # Close Header File
-              h_file.write("\n#endif // DATA_H\n")
+                # Write the golden result array with formatting
+                _write_array(c_file, golden_result, output_shape)
 
-    def modify_file(self, file_dir, pattern, replacement):
-        
-        with open(file_dir, 'r') as f:
-          content = f.read()
+                c_file.write("};\n\n")
 
-        # Replace the pattern with the replacement
-        new_content = re.sub(pattern, replacement, content)
-
-        with open(file_dir, 'w') as f:
-          f.write(new_content)
+            # Close Header File
+            h_file.write("\n#endif // DATA_H\n")
 
 #__________________________________________________________________________________________________#
 # Internal functions
+
+# Write the NumPy array values while keeping proper formatting
+def _write_array(f, array, shape, indent=2):
+    """
+    Writes a NumPy array in a flat C-style format with structured newlines.
+
+    - Uses newlines to visually separate dimensions instead of nested `{}`.
+    - The larger the dimension, the more newlines it inserts.
+
+    :param f: File handle to write to.
+    :param array: NumPy array to write.
+    :param shape: Shape of the array (tuple).
+    :param indent: Indentation level.
+    :param level: Current depth of recursion.
+    """
+    
+    flat_array = array.flatten()
+    num_dims = len(shape)
+    
+    f.write(" " * indent + "{\n")  # Start of array
+
+    for i, value in enumerate(flat_array):
+        # Insert the value
+        f.write(f" {value},")
+
+        # Insert a newline after every "row" (last dimension)
+        if (i + 1) % shape[-1] == 0:
+            f.write("\n" + " " * indent)
+
+        # Insert a **blank line** when finishing a 2D block (2nd-to-last dimension)
+        if num_dims >= 2 and (i + 1) % (shape[-2] * shape[-1]) == 0:
+            f.write("\n")
+
+        # Insert **two blank lines** when finishing a 3D block
+        if num_dims >= 3 and (i + 1) % (shape[-3] * shape[-2] * shape[-1]) == 0:
+            f.write("\n\n")
+
+        # Insert **three blank lines** when finishing a 4D block, and so on...
+        if num_dims >= 4:
+            for d in range(4, num_dims + 1):
+                if (i + 1) % np.prod(shape[-d:]) == 0:
+                    f.write("\n" * (d - 2))
+
+    f.write("\n" + " " * indent + "};\n")  # End of array
 
 def _load_database():
     """Loads existing database or initializes a new one."""
@@ -440,18 +478,16 @@ def _append_results_to_db(test_name, iteration, results):
     with open(DB_FILE, "w") as file:
         json.dump(db, file, indent=4)
 
+# Dynamically load a function from 'functions.py'
 def _dyn_load_func(function_name, *args, **kwargs):
     """
-    Dynamically imports and executes a function from the 'lib' folder.
+    Dynamically imports and executes a function from 'functions.py' in the 'lib' folder.
     """
-    try:
-        module = importlib.import_module(f"lib.{function_name}")  # Import the module dynamically
-        function = getattr(module, function_name)  # Get the function from the module
-        return function(*args, **kwargs)  # Call the function with optional arguments
-    except (ModuleNotFoundError, AttributeError) as e:
-        print(f"ERROR: Function '{function_name}' could not be found in 'lib/'. Check if it exists.")
-        print(e)
-        return None
+
+    module = importlib.import_module("functions") 
+    function = getattr(module, function_name)
+    return function(*args, **kwargs)
+    
 
 # SUPER-IMPORTANT: Every communication by the SW application MUST end with an endword character, which is by default "&".
 def _serial_rx_setup(ser, serial_queue, endword="&"):

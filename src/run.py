@@ -64,16 +64,21 @@ def _makefile_has_target(target, makefile_path="Makefile"):
 #__________________________________________________________________________________________________#
 # External functions
 
-def verifit_run():
+def verifit_run(fpga_synthesized=False):
+    
+    current_directory = os.getcwd()
+
     # Load the configuration file
     data = _load_config()
     if data is None:
         rich.print("[bold red]ERROR: config.ver not found![/bold red")
         rich.print("Please run the 'setup' command first.")
         exit(1)
-    #TODO: Check for the verfit_golden.py file
     
-    current_directory = os.getcwd()
+    if not os.path.exists(f"{current_directory}/verifit_golden.py"):
+        rich.print("[bold red]ERROR: verifit_golden.py not found![/bold red")
+        rich.print("Please run the 'setup' command first.")
+        exit(1)    
 
     # Debug the configuration hjson
     _PRINT(data)
@@ -104,7 +109,7 @@ def verifit_run():
 
     # Build the model
     with Status(" [cyan]Building model...[/cyan]", spinner="dots") as status:
-        build_success = verEnv.build_model()
+        build_success = verEnv.build_model(fpga_synthesized)
 
     if not build_success:
         rich.print("  [bold red]ERROR: Model build failed![/bold red]")
@@ -145,7 +150,11 @@ def verifit_run():
 
     # Run the verification campaign
     for iteration in range(data['target']['iterations']):
-        verEnv.gen_datasets()
+        try:
+            verEnv.gen_datasets()
+        except Exception as e:
+            rich.print(f"  [bold red]ERROR: Dataset generation failed, {e}[/bold red]")
+
         for test in data['target']['tests']:
             if not verEnv.launch_test(app_name=test['name'], iteration=iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=test['outputTags'], timeout=100):
                 rich.print(f"  [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
