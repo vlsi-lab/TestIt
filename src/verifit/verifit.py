@@ -218,9 +218,10 @@ class VerifItEnv:
     # This function generates datasets for every test insered in config.ver.
     # Both input and output datasets are written in a single file, "data.c" and "data.h".
     def gen_datasets(self):
-        for test in self.cfg.get("test", []):
+        for test in self.cfg.get("tests", []):
             test_dir = test["dir"]
-            os.makedirs(test_dir, exist_ok=True)
+            if not os.path.exists(test_dir):
+                return False
 
             # Open files for writing
             try:
