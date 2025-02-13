@@ -13,10 +13,27 @@ setup(
     long_description_content_type = "text/markdown",
     package_dir = {"": "src"},
     packages=find_packages(where="src"),
-    install_requires=[],  # Add dependencies if needed
+    install_requires=[
+        "argparse",
+        "rich",
+        "os",
+        "subprocess",
+        "re",
+        "pexpect",
+        "threading",
+        "queue",
+        "random",
+        "numpy",
+        "importlib",
+        "serial",
+        "json",
+        "hjson",
+        "pkg_resources",
+        "shutil"
+    ],
     entry_points={
         "console_scripts": [
-            "verifit=verifit.main:main",  # This creates the `verifit` CLI command
+            "verifit=verifit.main:main",
         ],
     },
     python_requires = ">=3.6"

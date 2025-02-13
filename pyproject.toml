@@ -3,9 +3,9 @@ verifit/
         __init__.py
         main.py
         run.py
-        test.py
-        update.py
+        run_util.py
         verifit.py
+        verifit_util.py
     templates/
         config.ver
         verifit_golden.py
