@@ -44,6 +44,8 @@ def __makefile_has_target(target):
 # Extracts all top-level targets from a Makefile.
 def __extract_makefile_targets():
     targets = []
+
+    print(f"Current working directory: {os.getcwd()}")
     
     with open(f"{os.getcwd()}/Makefile", "r") as file:
         for line in file:
@@ -51,4 +53,5 @@ def __extract_makefile_targets():
             if match:
                 targets.append(match.group(1))
 
+    print(f"Extracted targets: {targets}")
     return targets
