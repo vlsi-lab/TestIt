@@ -219,7 +219,7 @@ class VerifItEnv:
     # Both input and output datasets are written in a single file, "data.c" and "data.h".
     def gen_datasets(self):
         for test in self.cfg.get("tests", []):
-            print(test)
+            
             test_dir = test["dir"]
             if not os.path.exists(test_dir):
                 return False
@@ -309,7 +309,7 @@ class VerifItEnv:
 
                         c_file.write("};\n\n")
 
-                    output_dataset = test.get("outputDataset", [])
+                    output_dataset = test.get("outputDataset", {})
                     
                     if output_dataset:
                         # Generate the golden results using the golden function
