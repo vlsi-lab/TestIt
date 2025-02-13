@@ -1,5 +1,5 @@
 import argparse
-import run
+from . import run
 
 def main():
     parser = argparse.ArgumentParser(description="VeriFit CLI tool")

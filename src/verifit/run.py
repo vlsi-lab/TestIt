@@ -1,8 +1,8 @@
-from run_util import _load_config, _PRINT, _copy_package_file, _makefile_target_check
+from . import run_util 
 from rich.progress import Progress, BarColumn, TimeRemainingColumn, TextColumn
 from rich.status import Status
 import rich
-import verifit
+from . import verifit
 import os
 
 def verifit_run(nosynth=False):
@@ -10,7 +10,7 @@ def verifit_run(nosynth=False):
     current_directory = os.getcwd()
 
     # Load the configuration file
-    data = _load_config()
+    data = run_util._load_config()
     if data is None:
         rich.print("[bold red]ERROR: config.ver not found![/bold red")
         rich.print("Please run the 'setup' command first.")
@@ -22,7 +22,7 @@ def verifit_run(nosynth=False):
         exit(1)    
 
     # Debug the configuration hjson
-    _PRINT(data)
+    run_util._PRINT(data)
 
     # Create the VerifIt object
     verEnv = verifit.VerifIt(data)
@@ -37,7 +37,7 @@ def verifit_run(nosynth=False):
     print("Setting up VerifIt project...")
 
     # Check the presence of the required Makefile targets
-    if not _makefile_target_check() :
+    if not run_util._makefile_target_check() :
         rich.print("  [bold red]ERROR: Makefile sanity check failed![/bold red]")
         exit(1)
     else:
@@ -107,11 +107,11 @@ def verifit_setup():
     if os.path.exists(f"{current_directory}/verifit_golden.py"):
         rich.print("[orange]WARNING: 'verifit_golden.py' already exists in the current directory.[\orange]")    
     else: 
-        _copy_package_file("templates/verifit_golden.py")
+        run_util._copy_package_file("templates/verifit_golden.py")
         rich.print("Generation of 'verifit_golden.py' [bold green]successful[/bold green]!")
     
     if os.path.exists(f"{current_directory}/config.ver"):
         rich.print("[orange]WARNING: 'config.ver' already exists in the current directory.[\orange]")
     else:
-        _copy_package_file("templates/config.ver")
+        run_util._copy_package_file("templates/config.ver")
         rich.print("Generation of 'config.ver' [bold green]successful[/bold green]!")

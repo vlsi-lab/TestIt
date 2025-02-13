@@ -7,7 +7,7 @@ import queue
 import random
 import os
 import numpy as np
-from verifit_util import _write_array, _load_database, _clear_database, _append_results_to_report, _serial_rx_setup, _dyn_load_func
+from . import verifit_util
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
@@ -24,7 +24,7 @@ class VerifItEnv:
         self.cfg = config
         self.results = []
         self.it_times = []
-        _clear_database()
+        verifit_util._clear_database()
 
     def reset_all(self):
         self.results = []
@@ -75,7 +75,7 @@ class VerifItEnv:
         try:
             self.serial_comm_instance = serial.Serial(self.cfg['target']['usbPort'], self.cfg['target']['baudrate'], timeout=1)
             self.serial_comm_queue = queue.Queue()
-            self.serial_comm_thread = threading.Thread(target=_serial_rx_setup, args=(self.ser, self.serial_comm_queue))
+            self.serial_comm_thread = threading.Thread(target=verifit_util._serial_rx_setup, args=(self.ser, self.serial_comm_queue))
             
             if self.serial_comm_instance.is_open:
                 return True
@@ -206,7 +206,7 @@ class VerifItEnv:
                 result_dict = {output_tags[i]: matched_data[i] for i in range(len(matched_data))}
                 break
 
-        _append_results_to_report(app_name, iteration, result_dict)
+        verifit_util._append_results_to_report(app_name, iteration, result_dict)
 
     # Dumps the results of the tests up until this point into a result file
     def dump_results(self, filename="results.txt"):
@@ -302,14 +302,14 @@ class VerifItEnv:
                     c_file.write(f"const {datatype} {dataset_name}[{total_size}]" + " = {{\n")
                     
                     # Write the golden result array with formatting
-                    _write_array(c_file, input_array, dataset_shape)
+                    verifit_util._write_array(c_file, input_array, dataset_shape)
 
                     c_file.write("};\n\n")
 
                 # Generate the golden results using the golden function
                 golden_function = test["goldenResultFunction"]["name"]
                 try:
-                    golden_results = _dyn_load_func(golden_function, input_arrays, test["parameters"])
+                    golden_results = verifit_util._dyn_load_func(golden_function, input_arrays, test["parameters"])
                 except Exception as e:
                     raise ValueError(f"failed to find golden function '{golden_function}'. Check if it exists in 'functions.py'")
 
@@ -327,7 +327,7 @@ class VerifItEnv:
                     c_file.write(f"const {output_datatype} {output_name}[{total_size}]" + " = {{\n")
 
                     # Write the golden result array with formatting
-                    _write_array(c_file, golden_result, output_shape)
+                    verifit_util._write_array(c_file, golden_result, output_shape)
 
                     c_file.write("};\n\n")
 
