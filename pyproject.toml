@@ -1,15 +1,3 @@
-verifit/
-    src/
-        __init__.py
-        main.py
-        run.py
-        run_util.py
-        verifit.py
-        verifit_util.py
-    templates/
-        config.ver
-        verifit_golden.py
-    LICENSE
-    README.md
-    pyproject.toml
-    setup.py
+[build-system]
+requires = ['setuptools>=42']
+build-backend = 'setuptools.build_meta'
