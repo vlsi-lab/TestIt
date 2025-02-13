@@ -303,7 +303,7 @@ class VerifItEnv:
                         h_file.write(f"extern const {datatype} {dataset_name}[{total_size}];\n")
 
                         # Define dataset in Source File (data.c)
-                        c_file.write(f"const {datatype} {dataset_name}[{total_size}]" + " = {{\n")
+                        c_file.write(f"const {datatype} {dataset_name}[{total_size}]" + " = {\n")
                         
                         # Write the golden result array with formatting
                         verifit_util._write_array(c_file, input_array, dataset_shape)

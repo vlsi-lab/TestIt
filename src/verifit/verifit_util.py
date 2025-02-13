@@ -12,12 +12,13 @@ DEBUG_MODE = False
 DB_FILE = "test_results.json"
 
 def _write_array(f, array, shape, indent=2):
+    print(f"Writing array with shape {shape} to file")
+    print(array)
     
     flat_array = array.flatten()
     num_dims = len(shape)
+    f.write(" " * indent)
     
-    f.write(" " * indent + "{\n") 
-
     for i, value in enumerate(flat_array):
         
         f.write(f" {value},")
@@ -27,20 +28,20 @@ def _write_array(f, array, shape, indent=2):
             f.write("\n" + " " * indent)
 
         # Insert a **blank line** when finishing a 2D block (2nd-to-last dimension)
-        if num_dims >= 2 and (i + 1) % (shape[-2] * shape[-1]) == 0:
+        if num_dims > 2 and (i + 1) % (shape[-2] * shape[-1]) == 0:
             f.write("\n")
 
         # Insert **two blank outputLines** when finishing a 3D block
-        if num_dims >= 3 and (i + 1) % (shape[-3] * shape[-2] * shape[-1]) == 0:
+        if num_dims > 3 and (i + 1) % (shape[-3] * shape[-2] * shape[-1]) == 0:
             f.write("\n\n")
 
         # Insert **three blank outputLines** when finishing a 4D block, and so on...
-        if num_dims >= 4:
+        if num_dims > 4:
             for d in range(4, num_dims + 1):
                 if (i + 1) % np.prod(shape[-d:]) == 0:
                     f.write("\n" * (d - 2))
 
-    f.write("\n" + " " * indent + "};\n")
+    f.write("\n" + " " * indent)
 
 # Loads the existing database or initializes a new one
 def _load_database():
