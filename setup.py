@@ -13,6 +13,9 @@ setup(
     long_description_content_type = "text/markdown",
     package_dir = {"": "src"},
     include_package_data=True,
+    package_data={
+        "verifit": ["templates/*"], 
+    },
     packages=find_packages(where="src"),
     install_requires=[
         "rich",
