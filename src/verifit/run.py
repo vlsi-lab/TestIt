@@ -92,7 +92,7 @@ def verifit_run(nosynth=False):
             rich.print(f"  [bold red]ERROR: Dataset generation failed, {e}[/bold red]")
 
         for test in data['tests']:
-            if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout=100):
+            if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=100):
                 rich.print(f"  [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
                 exit(1)
             else:
