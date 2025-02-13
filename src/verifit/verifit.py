@@ -45,17 +45,17 @@ class VerifItEnv:
         if self.cfg['target']['type'] == "fpga":
           if fpga_synthesized:
             cmd = f"make fpga-build board={self.cfg['target']['name']}"
-            subprocess.run(cmd, shell=True, capture_output=True, text=True)
-            if ("ERROR" in cmd.stderr) or ("Error" in cmd.stderr):
-                print(cmd.stderr)
+            build_result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+            if ("ERROR" in build_result.stderr) or ("Error" in build_result.stderr):
+                print(build_result.stderr)
                 return False
             else:
                 return True
         else:
           cmd = f"make sim-build tool={self.cfg['target']['name']}"
-          subprocess.run(cmd, shell=True, capture_output=True, text=True)
-          if ("ERROR" in cmd.stderr) or ("Error" in cmd.stderr):
-              print(cmd.stderr)
+          build_result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+          if ("ERROR" in build_result.stderr) or ("Error" in build_result.stderr):
+              print(build_result.stderr)
               return False
           else:
               return True
@@ -63,9 +63,9 @@ class VerifItEnv:
     # Load the bitstream into the FPGA board
     def load_fpga_model(self):
         cmd = f"make fpga-load board={self.cfg['target']['name']}"
-        subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        if ("ERROR" in cmd.stderr) or ("Error" in cmd.stderr):
-            print(cmd.stderr)
+        load_result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+        if ("ERROR" in load_result.stderr) or ("Error" in load_result.stderr):
+            print(load_result.stderr)
             return False
         else:
             return True
