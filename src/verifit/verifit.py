@@ -306,30 +306,32 @@ class VerifItEnv:
 
                     c_file.write("};\n\n")
 
-                # Generate the golden results using the golden function
-                golden_function = test["goldenResultFunction"]["name"]
-                try:
-                    golden_results = verifit_util._dyn_load_func(golden_function, input_arrays, test["parameters"])
-                except Exception as e:
-                    raise ValueError(f"failed to find golden function '{golden_function}'. Check if it exists in 'functions.py'")
-
                 output_dataset = test.get("outputDataset", [])
+                
+                if output_dataset:
+                    # Generate the golden results using the golden function
+                    golden_function = test["goldenResultFunction"]["name"]
+                    try:
+                        golden_results = verifit_util._dyn_load_func(golden_function, input_arrays, test["parameters"])
+                    except Exception as e:
+                        raise ValueError(f"failed to find golden function '{golden_function}'. Check if it exists in 'functions.py'")
 
-                # Write the golden result
-                for golden_result in golden_results:
-                    output_name = output_dataset["name"]
-                    output_shape = golden_result.shape
-                    output_datatype = output_dataset["dataType"]
+                    
+                    # Write the golden result
+                    for golden_result in golden_results:
+                        output_name = output_dataset["name"]
+                        output_shape = golden_result.shape
+                        output_datatype = output_dataset["dataType"]
 
-                    total_size = np.prod(output_shape)
-                    h_file.write(f"extern const {output_datatype} {output_name}[{total_size}];\n")
+                        total_size = np.prod(output_shape)
+                        h_file.write(f"extern const {output_datatype} {output_name}[{total_size}];\n")
 
-                    c_file.write(f"const {output_datatype} {output_name}[{total_size}]" + " = {{\n")
+                        c_file.write(f"const {output_datatype} {output_name}[{total_size}]" + " = {{\n")
 
-                    # Write the golden result array with formatting
-                    verifit_util._write_array(c_file, golden_result, output_shape)
+                        # Write the golden result array with formatting
+                        verifit_util._write_array(c_file, golden_result, output_shape)
 
-                    c_file.write("};\n\n")
+                        c_file.write("};\n\n")
 
                 # Close Header File
                 h_file.write("\n#endif // DATA_H\n")
