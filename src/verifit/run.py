@@ -107,11 +107,11 @@ def verifit_setup():
     if os.path.exists(f"{current_directory}/verifit_golden.py"):
         rich.print("[orange]WARNING: 'verifit_golden.py' already exists in the current directory.[\orange]")    
     else: 
-        run_util._copy_package_file("templates/verifit_golden.py")
+        run_util._copy_package_file("verifit_golden.py")
         rich.print("Generation of 'verifit_golden.py' [bold green]successful[/bold green]!")
     
     if os.path.exists(f"{current_directory}/config.ver"):
         rich.print("[orange]WARNING: 'config.ver' already exists in the current directory.[\orange]")
     else:
-        run_util._copy_package_file("templates/config.ver")
+        run_util._copy_package_file("config.ver")
         rich.print("Generation of 'config.ver' [bold green]successful[/bold green]!")
