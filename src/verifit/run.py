@@ -83,7 +83,7 @@ def verifit_run(nosynth=False):
             rich.print("  GDB setup [bold green]successful[/bold green]!")
 
     # Run the verification campaign
-    task = progress.add_task("Running tests...", total=data['target']['iterations'] * len(data['target']['tests']))
+    task = progress.add_task("Running tests...", total=data['target']['iterations'] * len(data['tests']))
 
     for test_iteration in range(data['target']['iterations']):
         try:
@@ -91,7 +91,7 @@ def verifit_run(nosynth=False):
         except Exception as e:
             rich.print(f"  [bold red]ERROR: Dataset generation failed, {e}[/bold red]")
 
-        for test in data['target']['tests']:
+        for test in data['tests']:
             if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=test['outputTags'], timeout=100):
                 rich.print(f"  [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
                 exit(1)
