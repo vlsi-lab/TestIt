@@ -1,7 +1,7 @@
 import hjson
 import os
 import re
-import pkg_resources
+import importlib_resources as resources
 import shutil
 
 # Set this to True to enable debugging prints
@@ -32,7 +32,7 @@ def _makefile_target_check():
 
 # Copies a file from the package directory to the current working directory
 def _copy_package_file(filename):
-    resource_path = pkg_resources.resource_filename("your_package", filename)
+    resource_path = resources.files(filename) / "verifit"
     shutil.copy(resource_path, os.getcwd())
     
 # Checks if a specific target exists in the target project Makefile

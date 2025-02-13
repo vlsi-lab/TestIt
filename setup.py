@@ -19,12 +19,12 @@ setup(
         "numpy",
         "serial",
         "hjson",
-        "pkg_resources"
+        "importlib_resources"
     ],
     entry_points={
         "console_scripts": [
             "verifit=verifit.main:main",
         ],
     },
-    python_requires = ">=3.6"
+    python_requires = ">=3.7"
 )
