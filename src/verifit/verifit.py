@@ -222,6 +222,7 @@ class VerifItEnv:
             
             test_dir = test["dir"]
             if not os.path.exists(test_dir):
+                print(f"ERROR: Test directory '{test_dir}' not found.")
                 return False
 
             # Open files for writing
@@ -341,3 +342,5 @@ class VerifItEnv:
             except Exception as e:
                 print(f"ERROR: {e}")
                 return False
+        
+        return True
