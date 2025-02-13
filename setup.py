@@ -12,6 +12,7 @@ setup(
     long_description = long_description,
     long_description_content_type = "text/markdown",
     package_dir = {"": "src"},
+    include_package_data=True,
     packages=find_packages(where="src"),
     install_requires=[
         "rich",
