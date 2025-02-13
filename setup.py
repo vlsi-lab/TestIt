@@ -14,22 +14,12 @@ setup(
     package_dir = {"": "src"},
     packages=find_packages(where="src"),
     install_requires=[
-        "argparse",
         "rich",
-        "os",
-        "subprocess",
-        "re",
         "pexpect",
-        "threading",
-        "queue",
-        "random",
         "numpy",
-        "importlib",
         "serial",
-        "json",
         "hjson",
-        "pkg_resources",
-        "shutil"
+        "pkg_resources"
     ],
     entry_points={
         "console_scripts": [
