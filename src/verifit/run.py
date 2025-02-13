@@ -86,10 +86,8 @@ def verifit_run(nosynth=False):
     task = progress.add_task("Running tests...", total=data['target']['iterations'] * len(data['tests']))
 
     for test_iteration in range(data['target']['iterations']):
-        try:
-            verEnv.gen_datasets()
-        except Exception as e:
-            rich.print(f"  [bold red]ERROR: Dataset generation failed, {e}[/bold red]")
+        if not verEnv.gen_datasets():
+          rich.print(f"  [bold red]ERROR: Dataset generation failed![/bold red]")
 
         for test in data['tests']:
             if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=100):
