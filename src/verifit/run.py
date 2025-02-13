@@ -21,9 +21,6 @@ def verifit_run(nosynth=False):
         rich.print("Please run the 'setup' command first.")
         exit(1)    
 
-    # Debug the configuration hjson
-    run_util._PRINT(data)
-
     # Create the VerifIt object
     verEnv = verifit.VerifItEnv(data)
 
