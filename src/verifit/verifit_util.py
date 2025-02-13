@@ -11,10 +11,7 @@ DEBUG_MODE = False
 # Define the name of the internal result database
 DB_FILE = "test_results.json"
 
-def _write_array(f, array, shape, indent=2):
-    print(f"Writing array with shape {shape} to file")
-    print(array)
-    
+def _write_array(f, array, shape, indent=2):    
     flat_array = array.flatten()
     num_dims = len(shape)
     f.write(" " * indent)
@@ -23,7 +20,7 @@ def _write_array(f, array, shape, indent=2):
         
         f.write(f" {value}")
 
-        if i < len(flat_array):
+        if i < len(flat_array) - 1:
             f.write(",")
             # Insert a newline after every "row" (last dimension)
             if (i + 1) % shape[-1] == 0:
