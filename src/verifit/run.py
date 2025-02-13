@@ -25,7 +25,7 @@ def verifit_run(nosynth=False):
     run_util._PRINT(data)
 
     # Create the VerifIt object
-    verEnv = verifit.VerifIt(data)
+    verEnv = verifit.VerifItEnv(data)
 
     progress = Progress(
         TextColumn("[bold cyan]{task.description}"),
