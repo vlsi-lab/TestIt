@@ -128,7 +128,10 @@ class VerifItEnv:
             self.serial_comm_thread.start()
 
             # Compile the application
-            app_compile_cmd = f"make sw app={app_name}"
+            if self.cfg['target']['sim']:
+                app_compile_cmd = f"make sw-sim app={app_name} target={self.cfg['target']['name']}"
+            else:
+                app_compile_cmd = f"make sw-fpga app={app_name} target={self.cfg['target']['name']}"
             result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
 
             if ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr):
