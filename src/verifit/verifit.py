@@ -11,7 +11,7 @@ from . import verifit_util
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # TODO: REMOVE BEFORE RELEASE
 def PRINT_DEB(*args, **kwargs):
@@ -190,7 +190,7 @@ class VerifItEnv:
 
             # Read the output file
             try:
-                with open(f"sw/build/{app_name}.out", 'r') as f:
+                with open(self.cfg['target']['outputFile'], 'r') as f:
                     outputLines = f.readlines()
             except FileNotFoundError:
                 return False
