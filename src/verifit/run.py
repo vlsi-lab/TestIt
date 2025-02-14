@@ -5,7 +5,7 @@ import rich
 from . import verifit
 import os
 
-def verifit_run(=False):
+def verifit_run():
     
     current_directory = os.getcwd()
 
