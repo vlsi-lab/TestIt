@@ -9,7 +9,7 @@ import numpy as np
 DEBUG_MODE = False
 
 # Define the name of the internal result database
-DB_FILE = "test_results.json"
+DB_FILE = os.getcwd() + "/test_results.json"
 
 def _write_array(f, array, shape, indent=2):    
     flat_array = array.flatten()
