@@ -6,7 +6,7 @@ import numpy as np
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 # Define the name of the internal result database
 DB_FILE = os.getcwd() + "/test_results.json"
@@ -59,6 +59,8 @@ def _append_results_to_report(test_name, iteration, results):
     
     db = _load_database()
 
+    PRINT_DEB(f"Appending results to report: {test_name}, iteration {iteration}, results: {results}")
+
     # Ensure the test has a list initialized
     if test_name not in db:
         db[test_name] = []
@@ -66,6 +68,8 @@ def _append_results_to_report(test_name, iteration, results):
     # Append new result
     result_entry = {"iteration": iteration, **results}
     db[test_name].append(result_entry)
+
+    PRINT_DEB(f"Database after appending: {db}")
 
     # Save back to JSON
     with open(DB_FILE, "w") as file:

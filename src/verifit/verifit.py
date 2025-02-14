@@ -11,7 +11,7 @@ from . import verifit_util
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 # TODO: REMOVE BEFORE RELEASE
 def PRINT_DEB(*args, **kwargs):
@@ -194,6 +194,8 @@ class VerifItEnv:
                     outputLines = f.readlines()
             except FileNotFoundError:
                 return False
+        
+        PRINT_DEB("Output lines:", outputLines)
 
         # Analyse the results of the test
         pattern = re.compile(pattern)  
