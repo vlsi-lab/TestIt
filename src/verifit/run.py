@@ -76,7 +76,7 @@ def verifit_run(no_build=False):
         else:
             rich.print(" - GDB setup [bold green][✔][/bold green]")
 
-    rich.print("[cyan]\nStarting verification campaign...[\cyan]")
+    rich.print("[cyan]\nStarting verification campaign...[/cyan]")
 
     with Progress(
         TextColumn("[bold cyan]{task.description}"),
