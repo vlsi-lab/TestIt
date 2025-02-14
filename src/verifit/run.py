@@ -23,13 +23,6 @@ def verifit_run(no_build=False):
 
     # Create the VerifIt object
     verEnv = verifit.VerifItEnv(data)
-
-    progress = Progress(
-        TextColumn("[bold cyan]{task.description}"),
-        BarColumn(),
-        TimeRemainingColumn(),        
-        transient=True,
-    ) 
     
     print("Setting up VerifIt project...")
 
@@ -52,7 +45,7 @@ def verifit_run(no_build=False):
             rich.print("  Model build [bold green]successful[/bold green]!")
     else:
         rich.print("  [bold yellow]Skipping model build[/bold yellow]")
-        
+
     # If the target is an FPGA board, load the bitstream, then setup the serial connection and GDB
     if data['target']['type'] == "fpga":
         with Status(f" [cyan]Loading model on FPGA board {data['target']['name']}...[/cyan]", spinner="dots") as status:
@@ -81,23 +74,29 @@ def verifit_run(no_build=False):
             exit(1)
         else:
             rich.print("  GDB setup [bold green]successful[/bold green]!")
+            
+    with Progress(
+        TextColumn("[bold cyan]{task.description}"),
+        BarColumn(),
+        TimeRemainingColumn(),        
+        transient=True,
+    ) as progress:
+        # Run the verification campaign
+        task = progress.add_task("Running tests...", total=data['target']['iterations'] * len(data['tests']))
 
-    # Run the verification campaign
-    task = progress.add_task("Running tests...", total=data['target']['iterations'] * len(data['tests']))
+        for test_iteration in range(data['target']['iterations']):
+            if not verEnv.gen_datasets():
+              rich.print(f"  [bold red]ERROR: Dataset generation failed![/bold red]")
 
-    for test_iteration in range(data['target']['iterations']):
-        if not verEnv.gen_datasets():
-          rich.print(f"  [bold red]ERROR: Dataset generation failed![/bold red]")
+            for test in data['tests']:
+                if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=100):
+                    rich.print(f"  [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
+                    exit(1)
+                else:
+                    progress.update(task, advance=1, description=f"[cyan]{test_iteration}/{data['target']['iterations']}: {test['name']}")
 
-        for test in data['tests']:
-            if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=100):
-                rich.print(f"  [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
-                exit(1)
-            else:
-                progress.update(task, advance=1, description=f"[cyan]{test_iteration}/{data['target']['iterations']}: {test['name']}")
-
-    rich.print("[bold green]All tests run![/bold green]")
-    rich.print("VerifIt campaign completed")
+        rich.print("[bold green]All tests run![/bold green]")
+        rich.print("VerifIt campaign completed")
 
 # If necessary, generates the necessary files for the VerifIt package: verifit_golden.py and config.ver
 def verifit_setup():
