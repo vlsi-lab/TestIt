@@ -28,10 +28,11 @@ def verifit_run(no_build=False):
 
     # Check the presence of the required Makefile targets
     if not run_util._makefile_target_check() :
-        rich.print("  [bold red]ERROR: Makefile sanity check failed![/bold red]")
+        rich.print(" - [bold red]ERROR: Target project Makefile check failed![/bold red]")
+        rich.print(" - Please ensure that the Makefile contains the required targets")
         exit(1)
     else:
-        rich.print("  Makefile sanity check [bold green]successful[/bold green]!")
+        rich.print(" - Target project Makefile sanity check [bold green]done[/bold green]")
 
     if not no_build:
         # Build the model
@@ -39,10 +40,10 @@ def verifit_run(no_build=False):
             build_success = verEnv.build_model()
 
         if not build_success:
-            rich.print("  [bold red]ERROR: Model build failed![/bold red]")
+            rich.print(" - [bold red]ERROR: Model build failed![/bold red]")
             exit(1)
         else:
-            rich.print("  Model build [bold green]successful[/bold green]!")
+            rich.print(" - Model build [bold green]done[/bold green]")
 
     # If the target is an FPGA board, load the bitstream, then setup the serial connection and GDB
     if data['target']['type'] == "fpga":
@@ -50,30 +51,33 @@ def verifit_run(no_build=False):
             load_success = verEnv.load_fpga_model()   
 
         if not load_success:
-            rich.print(f"  [bold red]ERROR: Model load on FPGA board {data['target']['name']} failed![/bold red]")
+            rich.print(f" - [bold red]ERROR: Model load on FPGA board {data['target']['name']} failed![/bold red]")
+            rich.print(" - Please ensure that the FPGA board is connected and powered on")
             exit(1)
         else:
-            rich.print(f"  Model load on FPGA board {data['target']['name']} [bold green]successful[/bold green]!")     
+            rich.print(f" - Model load on FPGA board {data['target']['name']} [bold green]done[/bold green]")     
 
         with Status(" [cyan]Setting up serial connection...[/cyan]", spinner="dots") as status:
             serial_setup_success = verEnv.serial_begin()
         
         if not serial_setup_success:
-            rich.print("  [bold red]ERROR: Serial setup failed![/bold red]")
+            rich.print(" - [bold red]ERROR: Serial setup failed![/bold red]")
+            rich.print(" - Please ensure that the serial port is correctly configured")
             exit(1)
         else:
-            rich.print("  Serial setup [bold green]successful[/bold green]!")
+            rich.print(" - Serial setup [bold green]done[/bold green]")
 
         with Status(" [cyan]Setting up GDB...[/cyan]", spinner="dots") as status:
             gdb_setup_success = verEnv.setup_gdb()
 
         if not gdb_setup_success:
-            rich.print("  [bold red]ERROR: GDB setup failed![/bold red]")
+            rich.print(" - [bold red]ERROR: GDB setup failed![/bold red]")
             exit(1)
         else:
-            rich.print("  GDB setup [bold green]successful[/bold green]!")
+            rich.print(" - GDB setup [bold green]done[/bold green]")
 
-    rich.print("VerifIt project setup [bold green]successful[/bold green]!")
+    rich.print("VerifIt project setup [bold green]done[/bold green]")
+    rich.print("\nStarting verification campaign...")
 
     with Progress(
         TextColumn("[bold cyan]{task.description}"),
@@ -86,14 +90,14 @@ def verifit_run(no_build=False):
 
         for test_iteration in range(data['target']['iterations']):
             if not verEnv.gen_datasets():
-              rich.print(f"  [bold red]ERROR: Dataset generation failed![/bold red]")
+              rich.print(f" - [bold red]ERROR: Dataset generation failed![/bold red]")
 
             for test in data['tests']:
                 if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=1000):
-                    rich.print(f"  [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
+                    rich.print(f" - [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
                     exit(1)
                 else:
-                    progress.update(task, advance=1, description=f"[cyan]{test_iteration}/{data['target']['iterations']}: {test['name']}")
+                    progress.update(task, advance=1, description=f"[cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['name']}", refresh=True)
 
         rich.print("[bold green]All tests run![/bold green]")
         rich.print("VerifIt campaign completed")
@@ -105,10 +109,10 @@ def verifit_setup():
         rich.print("[orange]WARNING: 'verifit_golden.py' already exists in the current directory.[\orange]")    
     else: 
         run_util._copy_package_file("templates/verifit_golden.py")
-        rich.print("Generation of 'verifit_golden.py' [bold green]successful[/bold green]!")
+        rich.print("Generation of 'verifit_golden.py' [bold green]done[/bold green]")
     
     if os.path.exists(f"{current_directory}/config.ver"):
         rich.print("[orange]WARNING: 'config.ver' already exists in the current directory.[\orange]")
     else:
         run_util._copy_package_file("templates/config.ver")
-        rich.print("Generation of 'config.ver' [bold green]successful[/bold green]!")
+        rich.print("Generation of 'config.ver' [bold green]done[/bold green]")
