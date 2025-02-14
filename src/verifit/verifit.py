@@ -11,7 +11,7 @@ from . import verifit_util
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # TODO: REMOVE BEFORE RELEASE
 def PRINT_DEB(*args, **kwargs):

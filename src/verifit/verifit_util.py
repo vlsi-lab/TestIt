@@ -6,7 +6,7 @@ import numpy as np
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # Define the name of the internal result database
 DB_FILE = os.getcwd() + "/test_results.json"
