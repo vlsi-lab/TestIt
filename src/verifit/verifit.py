@@ -208,6 +208,7 @@ class VerifItEnv:
                 break
 
         verifit_util._append_results_to_report(app_name, iteration, result_dict)
+        return True
 
     # Dumps the results of the tests up until this point into a result file
     def dump_results(self, filename="results.txt"):
