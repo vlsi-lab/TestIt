@@ -11,15 +11,15 @@ def main():
     
     # Add a flag to the 'run' command to indicate if the FPGA model has already been synthesized
     run_parser.add_argument(
-        "--nosynth",
+        "--nobuild",
         action="store_true",
-        help="Avoid synthesizing the FPGA model"
+        help="Avoid building the model"
     )
 
     args = parser.parse_args()
 
     if args.command == "run":
-        run.verifit_run(args.nosynth)
+        run.verifit_run(args.nobuild)
     elif args.command == "setup":
         run.verifit_setup()
 

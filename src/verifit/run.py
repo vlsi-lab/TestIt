@@ -5,7 +5,7 @@ import rich
 from . import verifit
 import os
 
-def verifit_run(nosynth=False):
+def verifit_run(=False):
     
     current_directory = os.getcwd()
 
@@ -42,7 +42,7 @@ def verifit_run(nosynth=False):
 
     # Build the model
     with Status(" [cyan]Building model...[/cyan]", spinner="dots") as status:
-        build_success = verEnv.build_model(nosynth)
+        build_success = verEnv.build_model()
 
     if not build_success:
         rich.print("  [bold red]ERROR: Model build failed![/bold red]")

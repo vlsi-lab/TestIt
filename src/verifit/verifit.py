@@ -40,17 +40,16 @@ class VerifItEnv:
     def clear_results(self):
         self.results = []
     
-    # Build the model for the simulation tool or the FPGA board, inlcuding the synthesis if needed
-    def build_model(self, fpga_synthesized=True):
+    # Build the model for the simulation tool or the FPGA board
+    def build_model(self):
         if self.cfg['target']['type'] == "fpga":
-          if fpga_synthesized:
-            cmd = f"make fpga-build board={self.cfg['target']['name']}"
-            build_result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-            if ("ERROR" in build_result.stderr) or ("Error" in build_result.stderr):
-                print(build_result.stderr)
-                return False
-            else:
-                return True
+          cmd = f"make fpga-build board={self.cfg['target']['name']}"
+          build_result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
+          if ("ERROR" in build_result.stderr) or ("Error" in build_result.stderr):
+              print(build_result.stderr)
+              return False
+          else:
+              return True
         else:
           cmd = f"make sim-build tool={self.cfg['target']['name']}"
           build_result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
