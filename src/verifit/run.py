@@ -5,7 +5,7 @@ import rich
 from . import verifit
 import os
 
-def verifit_run():
+def verifit_run(no_build=False):
     
     current_directory = os.getcwd()
 
@@ -40,16 +40,19 @@ def verifit_run():
     else:
         rich.print("  Makefile sanity check [bold green]successful[/bold green]!")
 
-    # Build the model
-    with Status(" [cyan]Building model...[/cyan]", spinner="dots") as status:
-        build_success = verEnv.build_model()
+    if not no_build:
+        # Build the model
+        with Status(" [cyan]Building model...[/cyan]", spinner="dots") as status:
+            build_success = verEnv.build_model()
 
-    if not build_success:
-        rich.print("  [bold red]ERROR: Model build failed![/bold red]")
-        exit(1)
+        if not build_success:
+            rich.print("  [bold red]ERROR: Model build failed![/bold red]")
+            exit(1)
+        else:
+            rich.print("  Model build [bold green]successful[/bold green]!")
     else:
-        rich.print("  Model build [bold green]successful[/bold green]!")
-
+        rich.print("  [bold yellow]Skipping model build[/bold yellow]")
+        
     # If the target is an FPGA board, load the bitstream, then setup the serial connection and GDB
     if data['target']['type'] == "fpga":
         with Status(f" [cyan]Loading model on FPGA board {data['target']['name']}...[/cyan]", spinner="dots") as status:
