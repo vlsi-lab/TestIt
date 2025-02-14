@@ -43,8 +43,6 @@ def verifit_run(no_build=False):
             exit(1)
         else:
             rich.print("  Model build [bold green]successful[/bold green]!")
-    else:
-        rich.print("  [bold yellow]Skipping model build[/bold yellow]")
 
     # If the target is an FPGA board, load the bitstream, then setup the serial connection and GDB
     if data['target']['type'] == "fpga":
@@ -74,7 +72,9 @@ def verifit_run(no_build=False):
             exit(1)
         else:
             rich.print("  GDB setup [bold green]successful[/bold green]!")
-            
+
+    rich.print("VerifIt project setup [bold green]successful[/bold green]!")
+
     with Progress(
         TextColumn("[bold cyan]{task.description}"),
         BarColumn(),
@@ -89,7 +89,7 @@ def verifit_run(no_build=False):
               rich.print(f"  [bold red]ERROR: Dataset generation failed![/bold red]")
 
             for test in data['tests']:
-                if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=100):
+                if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=1000):
                     rich.print(f"  [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
                     exit(1)
                 else:
