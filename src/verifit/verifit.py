@@ -245,7 +245,8 @@ class VerifItEnv:
     # This function generates datasets for every test insered in config.ver.
     # Both input and output datasets are written in a single file, "data.c" and "data.h".
     def gen_datasets(self):
-        for test in self.cfg.get("tests", []):
+        testCopy = copy.deepcopy(self.cfg.get("tests", []))
+        for test in testCopy:
             
             test_dir = test["dir"]
             if not os.path.exists(test_dir):
@@ -260,11 +261,9 @@ class VerifItEnv:
                     h_file.write("#define DATA_H\n\n")
                     h_file.write("#include <stdint.h>\n\n")
 
-                    testParameters = copy.deepcopy(self.cfg.get("parameters", []))
-
                     # Iterate through parameters list
                     if "parameters" in test:
-                        for param in testParameters:
+                        for param in test['parameters']:
                             param_name = param["name"]
                             param_value = param["value"]
 
@@ -297,7 +296,7 @@ class VerifItEnv:
                         converted_dimensions = []
                         for dim in dimensions:
                             if isinstance(dim, str):
-                                dim = next((p["value"] for p in testParameters if p["name"] == dim), 1)
+                                dim = next((p["value"] for p in test['parameters'] if p["name"] == dim), 1)
                             converted_dimensions.append(dim)
 
                         dataset_shape = tuple(converted_dimensions)
