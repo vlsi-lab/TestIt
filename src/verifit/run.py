@@ -112,7 +112,7 @@ def verifit_run(no_build=False, italian_mode=False):
                 rich.print(" - Pomodoro sauce [bold green][DONE][/bold green]") 
 
     if not italian_mode:
-        rich.print("[cyan]\nStarting verification campaign...[/cyan]")
+        rich.print("[cyan]\nRunning verification campaign...[/cyan]")
     else:
         rich.print("[cyan]\nThrowing in the pasta...[/cyan]")
 

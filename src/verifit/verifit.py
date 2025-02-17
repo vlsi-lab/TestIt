@@ -259,9 +259,11 @@ class VerifItEnv:
                     h_file.write("#define DATA_H\n\n")
                     h_file.write("#include <stdint.h>\n\n")
 
+                    testParameters = test.get("parameters", [])
+
                     # Iterate through parameters list
                     if "parameters" in test:
-                        for param in test["parameters"]:
+                        for param in testParameters:
                             param_name = param["name"]
                             param_value = param["value"]
 
@@ -294,7 +296,7 @@ class VerifItEnv:
                         converted_dimensions = []
                         for dim in dimensions:
                             if isinstance(dim, str):
-                                dim = next((p["value"] for p in test["parameters"] if p["name"] == dim), 1)
+                                dim = next((p["value"] for p in testParameters if p["name"] == dim), 1)
                             converted_dimensions.append(dim)
 
                         dataset_shape = tuple(converted_dimensions)
