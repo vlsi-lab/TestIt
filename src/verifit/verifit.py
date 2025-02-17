@@ -168,9 +168,10 @@ class VerifItEnv:
               PRINT_DEB("No new output from GDB.")
               self.gdb.terminate()
               return False
-
+            
+            exit_breakpoint_msg = r"Breakpoint 1, _exit \(exit_status=0\)"
             try:
-              self.gdb.expect('Breakpoint', timeout=timeout_t)
+              self.gdb.expect(exit_breakpoint_msg)
             except pexpect.TIMEOUT:
               PRINT_DEB("Timeout reached.")
               self.gdb.terminate()
