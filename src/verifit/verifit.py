@@ -342,9 +342,9 @@ class VerifItEnv:
                     
                     if output_dataset:
                         # Generate the golden results using the golden function
-                        golden_function = test["goldenResultFunction"]["name"]
                         try:
-                            golden_results = verifit_util._dyn_load_func(golden_function, input_arrays, test["parameters"])
+                            golden_function = verifit_util._dyn_load_func(test["goldenResultFunction"]["name"])
+                            golden_results = golden_function(input_arrays, test["parameters"])
                         except Exception as e:
                             raise ValueError(f"failed to find golden function '{golden_function}'. Check if it exists in 'verifit_golden.py'")
 

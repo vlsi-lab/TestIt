@@ -75,25 +75,12 @@ def _append_results_to_report(dir, test_name, iteration, results):
         json.dump(db, file, indent=4)
 
 # Dynamically load a function from 'verifit_golden.py'
-def _dyn_load_func(function_name, *args, **kwargs):
-    script_path = os.path.abspath("verifit_golden.py")  # Get absolute path
-    print(script_path)
-    script_dir = os.path.dirname(script_path)
-    print(script_dir)
-
-    module_name = "verifit_golden"
-    # Check if module is already loaded, otherwise load it dynamically
-    if module_name in sys.modules:
-        module = sys.modules[module_name]
-    else:
-        spec = importlib.util.spec_from_file_location(module_name, script_path)
-        module = importlib.util.module_from_spec(spec)
-        sys.modules[module_name] = module  # Manually add it to sys.modules
-        spec.loader.exec_module(module)  # Load the module
-
-    # Get the function dynamically
-    function = getattr(module, function_name, None)
-    return function(*args, **kwargs)
+def _dyn_load_func(function_name):
+    spec = importlib.util.spec_from_file_location(function_name, f"{os.getcwd()}/verifit_golden.py")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[function_name] = module
+    spec.loader.exec_module(module)
+    return module
     
 # SUPER-IMPORTANT: Every communication by the SW application MUST end with an endword character, which is by default "&".
 def _serial_rx_setup(ser, serial_comm_queue, endword="&"):
