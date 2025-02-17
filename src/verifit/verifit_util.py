@@ -1,4 +1,4 @@
-import importlib
+import importlib.util
 import json
 import os
 import serial
@@ -77,13 +77,22 @@ def _append_results_to_report(dir, test_name, iteration, results):
 # Dynamically load a function from 'verifit_golden.py'
 def _dyn_load_func(function_name, *args, **kwargs):
     script_path = os.path.abspath("verifit_golden.py")  # Get absolute path
+    print(script_path)
     script_dir = os.path.dirname(script_path)
+    print(script_dir)
 
-    if script_dir not in sys.path:  # Ensure the directory is in sys.path
-        sys.path.insert(0, script_dir)
+    module_name = "verifit_golden"
+    # Check if module is already loaded, otherwise load it dynamically
+    if module_name in sys.modules:
+        module = sys.modules[module_name]
+    else:
+        spec = importlib.util.spec_from_file_location(module_name, script_path)
+        module = importlib.util.module_from_spec(spec)
+        sys.modules[module_name] = module  # Manually add it to sys.modules
+        spec.loader.exec_module(module)  # Load the module
 
-    module = importlib.import_module("verifit_golden") 
-    function = getattr(module, function_name)
+    # Get the function dynamically
+    function = getattr(module, function_name, None)
     return function(*args, **kwargs)
     
 # SUPER-IMPORTANT: Every communication by the SW application MUST end with an endword character, which is by default "&".
