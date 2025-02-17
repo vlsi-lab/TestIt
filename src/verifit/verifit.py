@@ -28,7 +28,7 @@ class VerifItEnv:
         self.cfg = config
         self.results = []
         self.it_times = []
-        verifit_util._clear_database(f"{self.cfg['report']['dir']}/test_results.json")
+        verifit_util._clear_database(self.cfg['report']['dir'])
 
     def reset_all(self):
         self.results = []
