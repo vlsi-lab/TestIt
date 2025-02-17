@@ -123,3 +123,6 @@ def _serial_rx_setup(ser, serial_comm_queue, endword="&"):
 def PRINT_DEB(*args, **kwargs):
     if DEBUG_MODE:
         print(*args, **kwargs)
+
+def _is_numpy_array(obj):
+    return isinstance(obj, np.ndarray)

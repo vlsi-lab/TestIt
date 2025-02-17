@@ -338,20 +338,27 @@ class VerifItEnv:
 
                         c_file.write("};\n\n")
 
-                    output_dataset = test.get("outputDataset", {})
+                    output_datasets = test.get("outputDataset", {})
+
+                    # Ensure output_datasets is a list (it might be a dict if only one exists)
+                    if isinstance(output_datasets, dict):
+                        output_datasets = [output_datasets]
                     
-                    if output_dataset:
+                    # Output datasets are not mandatory
+                    if output_datasets:
                         # Generate the golden results using the golden function
                         golden_function = verifit_util._dyn_load_func(test["goldenResultFunction"]["name"])
                         golden_results = golden_function(input_arrays, test["parameters"])
 
-                        print(f"Golden results: {golden_results}")
+                        # Ensure golden_results is a list (it might be a single array)
+                        if not verifit_util._is_numpy_array(golden_results):
+                            golden_results = [golden_results]
 
                         # Write the golden result
                         for golden_result in golden_results:
-                            output_name = output_dataset["name"]
+                            output_name = output_datasets["name"]
                             output_shape = golden_result.shape
-                            output_datatype = output_dataset["dataType"]
+                            output_datatype = output_datasets["dataType"]
 
                             total_size = np.prod(output_shape)
                             h_file.write(f"extern const {output_datatype} {output_name}[{total_size}];\n")
