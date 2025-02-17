@@ -27,7 +27,7 @@ def verifit_run(no_build=False, italian_mode=False):
     if not italian_mode:
       rich.print("[cyan]Setting up VerifIt project...[/cyan]")
     else:
-      rich.print("[bold green][][/bold green][white][][/white][bold red][][/bold red]")
+      rich.print("\n[bold green][][/bold green][white][][/white][bold red][][/bold red]\n")
       rich.print("[cyan]Bringing salted water to boil...[/cyan]")
 
     # Check the presence of the required Makefile targets
