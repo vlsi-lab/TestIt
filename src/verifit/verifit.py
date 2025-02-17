@@ -96,6 +96,8 @@ class VerifItEnv:
         make deb-setup
         """
         self.gdb = pexpect.spawn(f"/bin/bash -c '{gdb_cmd}'")
+        self.gdb.sendline("set pagination off")
+        self.gdb.sendline("set confirm off")
         self.gdb.expect('(gdb)')
         self.gdb.sendline('set remotetimeout 2000')
         self.gdb.expect('(gdb)')
@@ -168,20 +170,11 @@ class VerifItEnv:
               PRINT_DEB("No new output from GDB.")
               self.gdb.terminate()
               return False
-            
-            exit_breakpoint_msg = r"Breakpoint 1, _exit \(exit_status=0\)"
+
             try:
-              self.gdb.expect(exit_breakpoint_msg)
+              self.gdb.expect(r'Breakpoint', timeout=60)
             except pexpect.TIMEOUT:
               PRINT_DEB("Timeout reached.")
-              self.gdb.terminate()
-              return False
-            
-            try:
-              output = self.gdb.read_nonblocking(size=100, timeout=1)
-              PRINT_DEB("Current gdb output:", output)
-            except pexpect.TIMEOUT:
-              PRINT_DEB("No new output from GDB.")
               self.gdb.terminate()
               return False
             
