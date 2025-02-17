@@ -97,10 +97,10 @@ def verifit_run(no_build=False, italian_mode=False):
 
         if not italian_mode:
             with Status(" [cyan]Setting up GDB...[/cyan]", spinner="dots") as status:
-                gdb_setup_success = verEnv.setup_gdb()
+                gdb_setup_success = verEnv.setup_deb()
         else:
             with Status(" [cyan]Cooking the pomodoro sauce...[/cyan]", spinner="dots") as status:
-                gdb_setup_success = verEnv.setup_gdb()
+                gdb_setup_success = verEnv.setup_deb()
 
         if not gdb_setup_success:
             rich.print(" - [bold red]ERROR: GDB setup failed![/bold red]")
