@@ -77,16 +77,18 @@ class VerifItEnv:
     def serial_begin(self):
         try:
             self.serial_comm_instance = serial.Serial(f"/dev/ttyUSB{self.cfg['target']['usbPort']}", self.cfg['target']['baudrate'], timeout=1)
-            self.serial_comm_queue = queue.Queue()
-            self.serial_comm_thread = threading.Thread(target=verifit_util._serial_rx_setup, args=(self.serial_comm_instance, self.serial_comm_queue))
             
-            if self.serial_comm_instance.is_open:
-                return True
-            else:
+            if not self.serial_comm_instance.is_open:
                 return False
         except Exception as e:
-            print("ERROR: Serial port could not be opened.")
+            print(f"Serial exception: {e}")
             return False
+        
+        self.serial_comm_queue = queue.Queue()
+        self.serial_comm_thread = threading.Thread(target=verifit_util._serial_rx_setup, args=(self.serial_comm_instance, self.serial_comm_queue))
+
+        return True
+            
 
     # Set-up GDB
     def setup_deb(self):
