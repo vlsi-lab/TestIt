@@ -163,20 +163,15 @@ class VerifItEnv:
             self.gdb.expect('(gdb)')
             self.gdb.sendline('continue')
 
-            try:
-              output = self.gdb.read_nonblocking(size=100, timeout=1)
-              PRINT_DEB("Current gdb output:", output)
-            except pexpect.TIMEOUT:
-              PRINT_DEB("No new output from GDB.")
-              self.gdb.terminate()
-              return False
-
-            try:
-              self.gdb.expect(r'Breakpoint', timeout=60)
-            except pexpect.TIMEOUT:
-              PRINT_DEB("Timeout reached.")
-              self.gdb.terminate()
-              return False
+            exit_detected = False
+            while not exit_detected:
+                try:
+                    index = self.gdb.expect([r"Breakpoint", pexpect.TIMEOUT], timeout=10)
+                    if index == 0:
+                        exit_detected = True
+                        print("Program finished execution.")
+                except pexpect.exceptions.EOF:
+                    break
             
             # Wait for serial to finish
             self.serial_comm_thread.join()
