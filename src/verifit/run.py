@@ -27,7 +27,7 @@ def verifit_run(no_build=False, italian_mode=False):
     if not italian_mode:
       rich.print("[cyan]Setting up VerifIt project...[/cyan]")
     else:
-      rich.print("[dark green]||[/dark green][white]||[/white][bold red]||[/bold red]")
+      rich.print("[bold green][][/bold green][white][][/white][bold red][][/bold red]")
       rich.print("[cyan]Bringing salted water to boil...[/cyan]")
 
     # Check the presence of the required Makefile targets
@@ -127,7 +127,7 @@ def verifit_run(no_build=False, italian_mode=False):
         if not italian_mode:
           task_message = " - Running tests..."
         else:
-          task_message = " - Cooking the pasta..."
+          task_message = " - Cooking..."
 
         task = progress.add_task(task_message, total=data['target']['iterations'] * len(data['tests']), start=False)
         start = False
