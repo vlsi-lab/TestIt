@@ -11,6 +11,7 @@ from . import verifit_util
 from rich.console import Console
 from rich.table import Table
 import json
+import copy
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
@@ -259,7 +260,7 @@ class VerifItEnv:
                     h_file.write("#define DATA_H\n\n")
                     h_file.write("#include <stdint.h>\n\n")
 
-                    testParameters = test.get("parameters", [])
+                    testParameters = copy.deepcopy(self.cfg.get("parameters", []))
 
                     # Iterate through parameters list
                     if "parameters" in test:
