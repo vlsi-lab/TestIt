@@ -50,8 +50,9 @@ def _load_database(dir):
 # Eliminates the existing database file
 def _clear_database(dir):
     if os.path.exists(f"{dir}/test_results.json"):
-        with open(f"{dir}/test_results.json", "w") as file:
-            file.write("")
+        os.remove(f"{dir}/test_results.json")
+    else:
+        exit(2)
 
 # Appends results to the report database
 def _append_results_to_report(dir, test_name, iteration, results):
