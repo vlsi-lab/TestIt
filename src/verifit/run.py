@@ -86,7 +86,7 @@ def verifit_run(no_build=False):
         transient=True,
     ) as progress:
         # Run the verification campaign
-        task = progress.add_task(" - Running tests...", total=data['target']['iterations'] * len(data['tests']), start=False, total=None)
+        task = progress.add_task(" - Running tests...", total=data['target']['iterations'] * len(data['tests']), start=False)
         start = False
 
         for test_iteration in range(data['target']['iterations']):
