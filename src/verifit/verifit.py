@@ -93,7 +93,7 @@ class VerifItEnv:
     # Set-up GDB
     def setup_deb(self):
         
-        self.gdb = pexpect.spawn(f"make deb-setup")
+        self.gdb = pexpect.spawn(f"cd {os.getcwd()} ; make deb-setup")
         self.gdb.expect('(gdb)')
         self.gdb.sendline('set remotetimeout 2000')
         self.gdb.expect('(gdb)')
