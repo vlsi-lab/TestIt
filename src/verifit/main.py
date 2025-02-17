@@ -7,6 +7,8 @@ def main():
 
     # Define subparsers for individual commands
     run_parser = subparsers.add_parser("run", help="Run the verification process")
+    subparsers.add_parser("setup", help="Run the verification process")
+    subparsers.add_parser("report", help="Run the verification process")
     
     # Add a flag to the 'run' command to indicate if the FPGA model has already been synthesized
     run_parser.add_argument(
