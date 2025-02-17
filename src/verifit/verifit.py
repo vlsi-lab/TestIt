@@ -76,7 +76,7 @@ class VerifItEnv:
     # Set-up serial communication with the FPGA board
     def serial_begin(self):
         try:
-            self.serial_comm_instance = serial.Serial(self.cfg['target']['usbPort'], self.cfg['target']['baudrate'], timeout=1)
+            self.serial_comm_instance = serial.Serial(f"/dev/ttyUSB{self.cfg['target']['usbPort']}", self.cfg['target']['baudrate'], timeout=1)
             self.serial_comm_queue = queue.Queue()
             self.serial_comm_thread = threading.Thread(target=verifit_util._serial_rx_setup, args=(self.serial_comm_instance, self.serial_comm_queue))
             
