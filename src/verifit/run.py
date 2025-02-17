@@ -158,13 +158,23 @@ def verifit_run(no_build=False, italian_mode=False):
 def verifit_setup():
     current_directory = os.getcwd()
     if os.path.exists(f"{current_directory}/verifit_golden.py"):
-        rich.print("[orange]WARNING: 'verifit_golden.py' already exists in the current directory.[\orange]")    
+        rich.print("[orange]WARNING: 'verifit_golden.py' already exists in the current directory.[/orange]")    
     else: 
         run_util._copy_package_file("templates/verifit_golden.py")
         rich.print("Generation of 'verifit_golden.py' [bold green][OK][/bold green]")
     
     if os.path.exists(f"{current_directory}/config.ver"):
-        rich.print("[orange]WARNING: 'config.ver' already exists in the current directory.[\orange]")
+        rich.print("[orange]WARNING: 'config.ver' already exists in the current directory.[/orange]")
     else:
         run_util._copy_package_file("templates/config.ver")
         rich.print("Generation of 'config.ver' [bold green][OK][/bold green]")
+
+# Generates a report of the last verification campaign
+def verifit_report():
+    # Load the configuration file
+    data = run_util._load_config()
+
+    # Create the VerifIt object
+    verEnv = verifit.VerifItEnv(data)
+
+    verEnv.gen_report()

@@ -8,6 +8,9 @@ import random
 import os
 import numpy as np
 from . import verifit_util
+from rich.console import Console
+from rich.table import Table
+import json
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
@@ -207,15 +210,36 @@ class VerifItEnv:
                 result_dict = {output_tags[i]: matched_data[i] for i in range(len(matched_data))}
                 break
 
-        verifit_util._append_results_to_report(app_name, iteration, result_dict)
+        verifit_util._append_results_to_report(self.cf['report']['dir'], app_name, iteration, result_dict)
         return True
 
-    # Dumps the results of the tests up until this point into a result file
-    def dump_results(self, filename="results.txt"):
-        with open(filename, 'w') as f:
-            for result in self.results:
-                f.write(result + '\n')
-        #TODO: add exception for file mismanagement
+    # Generate a report of the last verification campaign
+    def gen_report(self):
+        console = Console(record=True)
+
+        # Load results
+        with open(f"{self.cfg['target']['dir']}/test_results.json", "r") as f:
+            results = json.load(f)
+
+        for test_name, iterations in results.items():
+            # Create a new table for each test
+            table = Table(title=f"Test Report: {test_name}")
+
+            # Add columns dynamically based on the first entry
+            if iterations:
+                for key in iterations[0].keys():
+                    table.add_column(key, style="cyan")
+
+                # Add data rows
+                for entry in iterations:
+                    table.add_row(*[str(entry[key]) for key in entry])
+
+                # Print the table to the console and store it
+                console.print(table)
+
+        # Save the report to a file
+        with open(f"{self.cfg['report']['dir']}/report.rpt", "w") as f:
+            f.write(console.export_text())
     
     # This function generates datasets for every test insered in config.ver.
     # Both input and output datasets are written in a single file, "data.c" and "data.h".

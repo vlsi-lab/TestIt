@@ -7,7 +7,6 @@ def main():
 
     # Define subparsers for individual commands
     run_parser = subparsers.add_parser("run", help="Run the verification process")
-    setup_parser = subparsers.add_parser("setup", help="Setup the verification environment")
     
     # Add a flag to the 'run' command to indicate if the FPGA model has already been synthesized
     run_parser.add_argument(
@@ -28,6 +27,8 @@ def main():
         run.verifit_run(args.nobuild, args.mammamia)
     elif args.command == "setup":
         run.verifit_setup()
+    elif args.command == "report":
+        run.verifit_report()
 
 if __name__ == "__main__":
     main()

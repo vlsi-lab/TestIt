@@ -8,9 +8,6 @@ import numpy as np
 # TODO: REMOVE BEFORE RELEASE
 DEBUG_MODE = False
 
-# Define the name of the internal result database
-DB_FILE = os.getcwd() + "/test_results.json"
-
 def _write_array(f, array, shape, indent=2):    
     flat_array = array.flatten()
     num_dims = len(shape)
@@ -43,21 +40,21 @@ def _write_array(f, array, shape, indent=2):
     f.write("\n" + " " * indent)
 
 # Loads the existing database or initializes a new one
-def _load_database():
-    if os.path.exists(DB_FILE):
-        with open(DB_FILE, "r") as file:
+def _load_database(dir):
+    if os.path.exists(f"{dir}/test_results.json"):
+        with open(f"{dir}/test_results.json", "r") as file:
             return json.load(file)
     return {}
 
 # Eliminates the existing database file
-def _clear_database():
-    if os.path.exists(DB_FILE):
-        os.remove(DB_FILE)
+def _clear_database(dir):
+    if os.path.exists(f"{dir}/test_results.json"):
+        os.remove(f"{dir}/test_results.json")
 
 # Appends results to the report database
-def _append_results_to_report(test_name, iteration, results):
+def _append_results_to_report(dir, test_name, iteration, results):
     
-    db = _load_database()
+    db = _load_database(dir)
 
     PRINT_DEB(f"Appending results to report: {test_name}, iteration {iteration}, results: {results}")
 
@@ -72,7 +69,7 @@ def _append_results_to_report(test_name, iteration, results):
     PRINT_DEB(f"Database after appending: {db}")
 
     # Save back to JSON
-    with open(DB_FILE, "w") as file:
+    with open(f"{dir}/test_results.json", "w") as file:
         json.dump(db, file, indent=4)
 
 # Dynamically load a function from 'functions.py'
