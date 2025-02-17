@@ -16,10 +16,16 @@ def main():
         help="Avoid building the model"
     )
 
+    run_parser.add_argument(
+        "--mammamia",
+        action="store_true",
+        help="Let's cook some pasta"
+    )
+
     args = parser.parse_args()
 
     if args.command == "run":
-        run.verifit_run(args.nobuild)
+        run.verifit_run(args.nobuild, args.mammamia)
     elif args.command == "setup":
         run.verifit_setup()
 
