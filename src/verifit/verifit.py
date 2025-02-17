@@ -102,6 +102,7 @@ class VerifItEnv:
 
         if self.gdb.isalive():
             PRINT_DEB("GDB process is still running.")
+            return True
         else:
             PRINT_DEB("GDB process has terminated.")
             if self.gdb.exitstatus is not None:
