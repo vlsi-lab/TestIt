@@ -85,6 +85,7 @@ class VerifItEnv:
             else:
                 return False
         except Exception as e:
+            print("ERROR: Serial port could not be opened.")
             return False
 
     # Set-up GDB
