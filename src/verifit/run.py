@@ -83,11 +83,11 @@ def verifit_run(no_build=False, italian_mode=False):
                 serial_setup_success = verEnv.serial_begin()
         else:
             with Status(" [cyan]Opening a couple of pelati cans...[/cyan]", spinner="dots") as status:
-                serial_setup_success = verEnv.serial_begin
+                serial_setup_success = verEnv.serial_begin()
         
         if not serial_setup_success:
             rich.print(" - [bold red]ERROR: Serial setup failed![/bold red]")
-            rich.print(" - Please ensure that the serial port is correctly configured")
+            rich.print("   Please ensure that the serial port is correctly configured")
             exit(1)
         else:
             if not italian_mode:
