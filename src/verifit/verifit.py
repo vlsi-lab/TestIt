@@ -346,7 +346,7 @@ class VerifItEnv:
                         try:
                             golden_results = verifit_util._dyn_load_func(golden_function, input_arrays, test["parameters"])
                         except Exception as e:
-                            raise ValueError(f"failed to find golden function '{golden_function}'. Check if it exists in 'functions.py'")
+                            raise ValueError(f"failed to find golden function '{golden_function}'. Check if it exists in 'verifit_golden.py'")
 
                         
                         # Write the golden result

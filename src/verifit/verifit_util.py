@@ -3,6 +3,7 @@ import json
 import os
 import serial
 import numpy as np
+import sys
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
@@ -75,7 +76,12 @@ def _append_results_to_report(dir, test_name, iteration, results):
 
 # Dynamically load a function from 'verifit_golden.py'
 def _dyn_load_func(function_name, *args, **kwargs):
-    
+    script_path = os.path.abspath("verifit_golden.py")  # Get absolute path
+    script_dir = os.path.dirname(script_path)
+
+    if script_dir not in sys.path:  # Ensure the directory is in sys.path
+        sys.path.insert(0, script_dir)
+
     module = importlib.import_module("verifit_golden") 
     function = getattr(module, function_name)
     return function(*args, **kwargs)
