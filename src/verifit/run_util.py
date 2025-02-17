@@ -25,7 +25,7 @@ def _load_config():
     
 # Checks if required targets exist in the target project Makefile
 def _makefile_target_check():
-    make_sanity_check = __makefile_has_target("gdb-elf-setup")
+    make_sanity_check = __makefile_has_target("deb-setup")
     make_sanity_check &= __makefile_has_target("sw-sim") & __makefile_has_target("sw-fpga")
     make_sanity_check &= __makefile_has_target("sim-build") &  __makefile_has_target("sim-run") 
     make_sanity_check &= __makefile_has_target("fpga-build") & __makefile_has_target("fpga-load")

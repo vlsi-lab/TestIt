@@ -92,11 +92,8 @@ class VerifItEnv:
 
     # Set-up GDB
     def setup_deb(self):
-        gdb_cmd = f"""
-        cd {self.project_root}
-        $RISCV/bin/riscv32-unknown-elf-gdb ./sw/build/main.elf
-        """
-        self.gdb = pexpect.spawn(f"/bin/bash -c '{gdb_cmd}'")
+        
+        self.gdb = pexpect.spawn(f"make deb-setup")
         self.gdb.expect('(gdb)')
         self.gdb.sendline('set remotetimeout 2000')
         self.gdb.expect('(gdb)')

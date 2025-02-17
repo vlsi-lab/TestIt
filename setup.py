@@ -21,7 +21,7 @@ setup(
         "rich",
         "pexpect",
         "numpy",
-        "serial",
+        "pyserial",
         "hjson",
         "importlib_resources"
     ],
