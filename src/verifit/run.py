@@ -1,5 +1,5 @@
 from . import run_util 
-from rich.progress import Progress, BarColumn, TimeRemainingColumn, TextColumn
+from rich.progress import Progress, BarColumn, TimeRemainingColumn, TextColumn, SpinnerColumn
 from rich.status import Status
 import rich
 from . import verifit
@@ -24,7 +24,7 @@ def verifit_run(no_build=False):
     # Create the VerifIt object
     verEnv = verifit.VerifItEnv(data)
     
-    print("[cyan]Setting up VerifIt project...[\cyan]")
+    rich.print("[cyan]Setting up VerifIt project...[\cyan]")
 
     # Check the presence of the required Makefile targets
     if not run_util._makefile_target_check() :
@@ -81,11 +81,13 @@ def verifit_run(no_build=False):
     with Progress(
         TextColumn("[bold cyan]{task.description}"),
         BarColumn(),
-        TimeRemainingColumn(),        
+        TimeRemainingColumn(),   
+        SpinnerColumn(),   
         transient=True,
     ) as progress:
         # Run the verification campaign
-        task = progress.add_task(" - Running tests...", total=data['target']['iterations'] * len(data['tests']))
+        task = progress.add_task(" - Running tests...", total=data['target']['iterations'] * len(data['tests']), start=False, total=None)
+        start = False
 
         for test_iteration in range(data['target']['iterations']):
             if not verEnv.gen_datasets():
@@ -96,8 +98,11 @@ def verifit_run(no_build=False):
                 if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=1000):
                     rich.print(f" - [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
                     exit(1)
-                
-                progress.update(task, advance=1, description=f"[cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['name']}", refresh=True)
+                if not start:
+                    progress.start_task(task)
+                    start = True
+
+                progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['name']}", refresh=True)
 
         rich.print(" - All tests run![bold green][✔][/bold green]")
         rich.print("VerifIt campaign completed")
