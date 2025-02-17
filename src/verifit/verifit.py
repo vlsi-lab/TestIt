@@ -218,7 +218,7 @@ class VerifItEnv:
         console = Console(record=True)
 
         # Load results
-        with open(f"{self.cfg['target']['dir']}/test_results.json", "r") as f:
+        with open(f"{self.cfg['report']['dir']}/test_results.json", "r") as f:
             results = json.load(f)
 
         for test_name, iterations in results.items():
