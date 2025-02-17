@@ -177,6 +177,14 @@ class VerifItEnv:
               self.gdb.terminate()
               return False
             
+            try:
+              output = self.gdb.read_nonblocking(size=100, timeout=1)
+              PRINT_DEB("Current gdb output:", output)
+            except pexpect.TIMEOUT:
+              PRINT_DEB("No new output from GDB.")
+              self.gdb.terminate()
+              return False
+            
             # Wait for serial to finish
             self.serial_comm_thread.join()
             
