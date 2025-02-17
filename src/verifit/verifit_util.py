@@ -49,6 +49,7 @@ def _load_database(dir):
 
 # Eliminates the existing database file
 def _clear_database(dir):
+    print(dir)
     if os.path.exists(f"{dir}/test_results.json"):
         os.remove(f"{dir}/test_results.json")
     else:
