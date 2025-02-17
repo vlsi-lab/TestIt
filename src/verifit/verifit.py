@@ -345,7 +345,8 @@ class VerifItEnv:
                         golden_function = verifit_util._dyn_load_func(test["goldenResultFunction"]["name"])
                         golden_results = golden_function(input_arrays, test["parameters"])
 
-                        
+                        print(f"Golden results: {golden_results}")
+
                         # Write the golden result
                         for golden_result in golden_results:
                             output_name = output_dataset["name"]
@@ -355,7 +356,7 @@ class VerifItEnv:
                             total_size = np.prod(output_shape)
                             h_file.write(f"extern const {output_datatype} {output_name}[{total_size}];\n")
 
-                            c_file.write(f"const {output_datatype} {output_name}[{total_size}]" + " = {{\n")
+                            c_file.write(f"const {output_datatype} {output_name}[{total_size}]" + " = {\n")
 
                             # Write the golden result array with formatting
                             verifit_util._write_array(c_file, golden_result, output_shape)
