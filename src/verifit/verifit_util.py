@@ -7,7 +7,7 @@ import sys
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 def _write_array(f, array, shape, indent=2):    
     flat_array = array.flatten()
@@ -91,7 +91,7 @@ def _dyn_load_func(function_name):
     return getattr(module, function_name)
     
 # SUPER-IMPORTANT: Every communication by the SW application MUST end with an endword character, which is by default "&".
-def _serial_rx_setup(ser, serial_comm_queue, endword="&"):
+def _serial_rx_setup(ser: serial.Serial, serial_comm_queue, endword="&"):
     try:
         if not ser.is_open:
             raise serial.SerialException("Serial port not open")

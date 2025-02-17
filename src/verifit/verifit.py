@@ -15,7 +15,7 @@ import copy
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 # TODO: REMOVE BEFORE RELEASE
 def PRINT_DEB(*args, **kwargs):
@@ -169,7 +169,7 @@ class VerifItEnv:
                     index = self.gdb.expect([r"Breakpoint", pexpect.TIMEOUT], timeout=10)
                     if index == 0:
                         exit_detected = True
-                        print("Program finished execution.")
+                        PRINT_DEB("Program finished execution.")
                 except pexpect.exceptions.EOF:
                     break
             

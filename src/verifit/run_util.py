@@ -5,7 +5,7 @@ import importlib_resources as resources
 import shutil
 
 # Set this to True to enable debugging prints
-DEBUG_MODE = True # TODO: REMOVE THIS LINE BEFORE RELEASE
+DEBUG_MODE = False # TODO: REMOVE THIS LINE BEFORE RELEASE
 
 # Redefine print() to be enabled only during debugging
 def _PRINT(*args, **kwargs):
