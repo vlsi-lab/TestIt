@@ -70,7 +70,7 @@ def verifit_run(no_build=False, italian_mode=False):
 
         if not load_success:
             rich.print(f" - [bold red]ERROR: Model load on FPGA board {data['target']['name']} failed![/bold red]")
-            rich.print(" - Please ensure that the FPGA board is connected and powered on")
+            rich.print("   Please ensure that the FPGA board is connected and powered on")
             exit(1)
         else:
             if not italian_mode:
@@ -148,7 +148,7 @@ def verifit_run(no_build=False, italian_mode=False):
                 progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['appName']}", refresh=True)
         
         if not italian_mode:
-            rich.print(" - V [bold green][RAN][/bold green]")
+            rich.print(" - All tests [bold green][RAN][/bold green]")
             rich.print("\nVerifIt campaign completed!")
         else:
             rich.print(" - Pasta [bold green][COOKED][/bold green]")

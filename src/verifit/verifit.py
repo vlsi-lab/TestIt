@@ -49,16 +49,16 @@ class VerifItEnv:
         if self.cfg['target']['type'] == "fpga":
           cmd = f"make fpga-build board={self.cfg['target']['name']}"
           build_result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-          if ("ERROR" in build_result.stderr) or ("Error" in build_result.stderr):
-              print(build_result.stderr)
+          if ("ERROR" in build_result.stdout) or ("Error" in build_result.stdout):
+              print(build_result.stdout)
               return False
           else:
               return True
         else:
           cmd = f"make sim-build tool={self.cfg['target']['name']}"
           build_result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-          if ("ERROR" in build_result.stderr) or ("Error" in build_result.stderr):
-              print(build_result.stderr)
+          if ("ERROR" in build_result.stdout) or ("Error" in build_result.stdout):
+              print(build_result.stdout)
               return False
           else:
               return True
@@ -67,8 +67,8 @@ class VerifItEnv:
     def load_fpga_model(self):
         cmd = f"make fpga-load board={self.cfg['target']['name']}"
         load_result = subprocess.run(cmd, shell=True, capture_output=True, text=True)
-        if ("ERROR" in load_result.stderr) or ("Error" in load_result.stderr):
-            print(load_result.stderr)
+        if ("ERROR" in load_result.stdout) or ("Error" in load_result.stdout):
+            print(load_result.stdout)
             return False
         else:
             return True
@@ -134,8 +134,8 @@ class VerifItEnv:
             app_compile_cmd = f"make sw-fpga app={app_name} target={self.cfg['target']['name']}"
             result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
 
-            if ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr):
-                print(result_compilation.stderr)
+            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout):
+                print(result_compilation.stdout)
                 return False
             else:
                 PRINT_DEB("Compilation successful!")
@@ -176,8 +176,8 @@ class VerifItEnv:
             app_compile_cmd = f"make sw-sim app={app_name}"
             result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
 
-            if ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr):
-                print(result_compilation.stderr)
+            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout):
+                print(result_compilation.stdout)
                 return False
             
             PRINT_DEB("Compilation successful!")
@@ -186,8 +186,8 @@ class VerifItEnv:
             sim_cmd = f"make sim-run app={app_name}"
             result_sim = subprocess.run(sim_cmd, shell=True, capture_output=True, text=True)
 
-            if ("ERROR" in result_sim.stderr) or ("Error" in result_sim.stderr):
-                print(result_sim.stderr)
+            if ("ERROR" in result_sim.stdout) or ("Error" in result_sim.stdout):
+                print(result_sim.stdout)
                 return False
             
             PRINT_DEB("Simulation successful!")
