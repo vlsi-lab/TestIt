@@ -351,7 +351,7 @@ class VerifItEnv:
                         golden_results = golden_function(input_arrays, test["parameters"])
 
                         # Ensure golden_results is a list (it might be a single array)
-                        if not verifit_util._is_numpy_array(golden_results):
+                        if verifit_util._is_numpy_array(golden_results):
                             golden_results = [golden_results]
 
                         # Write the golden result
