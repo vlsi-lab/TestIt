@@ -355,10 +355,10 @@ class VerifItEnv:
                             golden_results = [golden_results]
 
                         # Write the golden result
-                        for golden_result in golden_results:
-                            output_name = output_datasets["name"]
+                        for iteration, golden_result in enumerate(golden_results):
+                            output_name = output_datasets[iteration]["name"]
                             output_shape = golden_result.shape
-                            output_datatype = output_datasets["dataType"]
+                            output_datatype = output_datasets[iteration]["dataType"]
 
                             total_size = np.prod(output_shape)
                             h_file.write(f"extern const {output_datatype} {output_name}[{total_size}];\n")
