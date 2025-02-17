@@ -210,7 +210,7 @@ class VerifItEnv:
                 result_dict = {output_tags[i]: matched_data[i] for i in range(len(matched_data))}
                 break
 
-        verifit_util._append_results_to_report(self.cf['report']['dir'], app_name, iteration, result_dict)
+        verifit_util._append_results_to_report(self.cfg['report']['dir'], app_name, iteration, result_dict)
         return True
 
     # Generate a report of the last verification campaign
