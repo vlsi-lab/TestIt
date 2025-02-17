@@ -7,7 +7,7 @@ import sys
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
-DEBUG_MODE = False
+DEBUG_MODE = True
 
 def _write_array(f, array, shape, indent=2):    
     flat_array = array.flatten()
