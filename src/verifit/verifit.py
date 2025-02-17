@@ -85,8 +85,7 @@ class VerifItEnv:
             return False
         
         self.serial_comm_queue = queue.Queue()
-        self.serial_comm_thread = threading.Thread(target=verifit_util._serial_rx_setup, args=(self.serial_comm_instance, self.serial_comm_queue))
-
+        
         return True
             
 
@@ -127,10 +126,11 @@ class VerifItEnv:
 
         # Test using the FPGA board
         if self.cfg['target']['type'] == "fpga":
-
+            # Check that the serial connection is still open
             if not self.serial_comm_instance.is_open:
                 print("ERROR: Serial port is not open!")
                 exit(1) 
+            self.serial_comm_thread = threading.Thread(target=verifit_util._serial_rx_setup, args=(self.serial_comm_instance, self.serial_comm_queue))
 
             self.serial_comm_thread.start()
 
@@ -160,6 +160,15 @@ class VerifItEnv:
             self.gdb.sendline('b _exit')
             self.gdb.expect('(gdb)')
             self.gdb.sendline('continue')
+
+            try:
+              output = self.gdb.read_nonblocking(size=100, timeout=1)
+              PRINT_DEB("Current gdb output:", output)
+            except pexpect.TIMEOUT:
+              PRINT_DEB("No new output from GDB.")
+              self.gdb.terminate()
+              return False
+
             try:
               self.gdb.expect('Breakpoint', timeout=timeout_t)
             except pexpect.TIMEOUT:
