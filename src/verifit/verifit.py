@@ -255,10 +255,10 @@ class VerifItEnv:
 
             # Open files for writing
             try:
-                with open(f"{test_dir}/data.h", 'w') as h_file, open(f"{test_dir}/data.c", 'w') as c_file:
+                with open(f"{test_dir}/{test['genFilesName']}.h", 'w') as h_file, open(f"{test_dir}/{test['genFilesName']}.c", 'w') as c_file:
                     
-                    h_file.write("#ifndef DATA_H\n")
-                    h_file.write("#define DATA_H\n\n")
+                    h_file.write("#ifndef VER_DATA_H\n")
+                    h_file.write("#define VER_DATA_H\n\n")
                     h_file.write("#include <stdint.h>\n\n")
 
                     # Iterate through parameters list
@@ -366,7 +366,7 @@ class VerifItEnv:
                             c_file.write("};\n\n")
 
                     # Close Header File
-                    h_file.write("\n#endif // DATA_H\n")
+                    h_file.write("\n#endif // VER_DATA_H\n")
             except Exception as e:
                 print(f"ERROR: {e}")
                 return False

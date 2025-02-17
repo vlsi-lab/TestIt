@@ -49,7 +49,8 @@ def _load_database(dir):
 # Eliminates the existing database file
 def _clear_database(dir):
     if os.path.exists(f"{dir}/test_results.json"):
-        os.remove(f"{dir}/test_results.json")
+        with open(f"{dir}/test_results.json", "w") as file:
+            file.write("")
 
 # Appends results to the report database
 def _append_results_to_report(dir, test_name, iteration, results):
@@ -72,10 +73,10 @@ def _append_results_to_report(dir, test_name, iteration, results):
     with open(f"{dir}/test_results.json", "w") as file:
         json.dump(db, file, indent=4)
 
-# Dynamically load a function from 'functions.py'
+# Dynamically load a function from 'verifit_golden.py'
 def _dyn_load_func(function_name, *args, **kwargs):
     
-    module = importlib.import_module("functions") 
+    module = importlib.import_module("verifit_golden") 
     function = getattr(module, function_name)
     return function(*args, **kwargs)
     

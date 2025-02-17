@@ -138,21 +138,21 @@ def verifit_run(no_build=False, italian_mode=False):
               exit(1)
 
             for test in data['tests']:
-                if not verEnv.launch_test(app_name=test['name'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=1000):
-                    rich.print(f" - [bold red]ERROR: Test {test['name']} failed because of GDB timeout[/bold red]")
+                if not verEnv.launch_test(app_name=test['appName'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=1000):
+                    rich.print(f" - [bold red]ERROR: Test {test['appName']} failed because of GDB timeout[/bold red]")
                     exit(1)
                 if not start:
                     progress.start_task(task)
                     start = True
 
-                progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['name']}", refresh=True)
+                progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['appName']}", refresh=True)
         
         if not italian_mode:
-            rich.print(" - All tests run![bold green][OK][/bold green]")
-            rich.print("VerifIt campaign completed")
+            rich.print(" - V [bold green][RAN][/bold green]")
+            rich.print("\nVerifIt campaign completed!")
         else:
             rich.print(" - Pasta [bold green][COOKED][/bold green]")
-            rich.print("A tavola!")
+            rich.print("\nA tavola!")
 
 # If necessary, generates the necessary files for the VerifIt package: verifit_golden.py and config.ver
 def verifit_setup():
