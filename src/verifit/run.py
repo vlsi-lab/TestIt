@@ -138,7 +138,7 @@ def verifit_run(no_build=False, italian_mode=False):
               exit(1)
 
             for test in data['tests']:
-                if not verEnv.launch_test(app_name=test['appName'], iteration=test_iteration, pattern=rf"{data['target']['outputFormat']}", output_tags=data['target']['outputTags'], timeout_t=1000):
+                if not verEnv.launch_test(app_name=test['appName'], iteration=test_iteration, pattern=rf"{test['outputFormat']}", output_tags=test['outputTags'], timeout_t=1000):
                     rich.print(f" - [bold red]ERROR: Test {test['appName']} failed because of GDB timeout[/bold red]")
                     exit(1)
                 if not start:
