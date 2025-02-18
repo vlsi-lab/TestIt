@@ -169,19 +169,9 @@ def __run_command(command):
 
 def _get_swipe_parameters(iteration, test):
     values = []
-    total_combinations = 1
     range_sizes = []
 
-    # Compute range sizes
-    for parameter in test['parameters']:
-        min_val = parameter[0]
-        max_val = parameter[1]
-        size = max_val - min_val + 1
-        range_sizes.append(size)
-        total_combinations *= size  # Total number of iterations
-
-    if iteration >= total_combinations:
-        raise ValueError("Iteration index exceeds total possible combinations")
+    print("AAAAAAAAAA")
 
     # Compute parameter values using mixed-base indexing
     for idx, (min_val, _) in enumerate(test['parameters']):
