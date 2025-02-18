@@ -150,15 +150,16 @@ def _run_command(command):
             if "ERROR" in output or "Error" in output or "error" in output:
                 process.terminate()
                 process.wait()
-                rich.print(f"CRITICAL ERROR: {output} failed!")
+                rich.print(f"[bold red]CRITICAL ERROR: {output} failed![/bold red]")
                 os._exit(1)
             
         error_output = process.stderr.readline()
         if error_output:
-            process.terminate()
-            process.wait()
-            rich.print(f"CRITICAL ERROR: {output} failed!")
-            os._exit(1)
+            if "ERROR" in output or "Error" in output or "error" in output:
+                process.terminate()
+                process.wait()
+                rich.print(f"[bold red]CRITICAL ERROR: {output} failed![/bold red]")
+                os._exit(1)
         
         # Check if process is still running
         if process.poll() is not None:
