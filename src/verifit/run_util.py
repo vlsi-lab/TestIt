@@ -87,8 +87,7 @@ def _get_tot_swipe_iterations(data):
     for test in data['tests']:
         tot = 1
         for parameter in test['parameters']:
-            print(parameter)
-            tot *= abs(parameter['value'][0] - parameter['value'][1] + 1)
+            tot *= abs(parameter['value'][0] - parameter['value'][1]) + 1
         swipe_parameters.append(tot)
 
     return swipe_parameters
