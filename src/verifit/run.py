@@ -154,14 +154,15 @@ def verifit_run(no_build=False, italian_mode=False):
 
                 progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['appName']}", refresh=True)
         
-        verEnv.stop_deb()
+        if data['target']['type'] == "fpga":
+            verEnv.stop_deb()
 
         if not italian_mode:
             rich.print(" - All tests [bold green][RAN][/bold green]")
-            rich.print("\nVerifIt campaign completed!")
+            rich.print("\nVerifIt campaign [bold green]completed![/bold green]")
         else:
             rich.print(" - Pasta [bold green][COOKED][/bold green]")
-            rich.print("\nA tavola!")
+            rich.print("\n[bold green]A tavola![/bold green]")
 
 # If necessary, generates the necessary files for the VerifIt package: verifit_golden.py and config.ver
 def verifit_setup():

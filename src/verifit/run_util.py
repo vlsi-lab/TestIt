@@ -61,5 +61,12 @@ def __extract_makefile_targets():
 def _update_time_estimation(progress, task_id):
     while not progress.tasks[task_id].finished:
         progress.refresh()
-        time.sleep(1)  # Adjust this to control the update frequency
+        print("-")
+        time.sleep(0.2)  # Adjust this to control the update frequency
         
+def _configuration_check(configuration):
+    if configuration['target']['type'] not in ["sim", "fpga"]:
+        rich.print("   [bold red]ERROR: Invalid target type![/bold red]")
+        rich.print(f"   {configuration['target']['type']} is neither 'sim' nor 'fpga'")
+        return False
+    

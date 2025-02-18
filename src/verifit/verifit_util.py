@@ -130,12 +130,12 @@ def _is_numpy_array(obj):
     return isinstance(obj, np.ndarray)
 
 def _run_command_threading(command):
-    thread = threading.Thread(target=_run_command, args=(command,), daemon=True)
+    thread = threading.Thread(target=__run_command, args=(command,), daemon=True)
     thread.start()
     return thread
 
 # If the command fails, the process will terminate and the script will exit
-def _run_command(command):
+def __run_command(command):
     process = subprocess.Popen(
         command,
         stdout=subprocess.PIPE,
