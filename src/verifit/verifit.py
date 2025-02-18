@@ -90,7 +90,7 @@ class VerifItEnv:
     def setup_gdb(self):
         gdb_cmd = f"""
         cd {os.getcwd()}
-        make deb-setup
+        make gdb-setup
         """
         self.gdb = pexpect.spawn(f"/bin/bash -c '{gdb_cmd}'")
         self.gdb.sendline("set pagination off")
