@@ -175,8 +175,12 @@ def _get_swipe_parameters(iteration, parameters):
      
     param_ranges = [(param["name"], param["value"]) for param in parameters]
 
+    print(param_ranges)
+
     # Compute parameter values using mixed-base indexing
     for idx, (min_val, _) in enumerate(param_ranges):
+        print(idx)
+        print(range_sizes)
         step = 1 if idx == 0 else step * range_sizes[idx - 1]
         param_value = min_val + (iteration // step) % range_sizes[idx]
         values.append(param_value)
