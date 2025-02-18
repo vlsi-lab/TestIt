@@ -16,6 +16,12 @@ def main():
         action="store_true",
         help="Avoid building the model"
     )
+    
+    run_parser.add_argument(
+        "--swipe",
+        action="store_true",
+        help="Avoid building the model"
+    )
 
     run_parser.add_argument(
         "--mammamia",
@@ -40,7 +46,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == "run":
-        run.verifit_run(args.nobuild, args.mammamia)
+        run.verifit_run(args.nobuild, args.mammamia, args.swipe)
     elif args.command == "setup":
         run.verifit_setup()
     elif args.command == "report":

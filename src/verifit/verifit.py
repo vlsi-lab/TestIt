@@ -254,7 +254,7 @@ class VerifItEnv:
     
     # This function generates datasets for every test insered in config.ver.
     # Both input and output datasets are written in a single file, "data.c" and "data.h".
-    def gen_datasets(self):
+    def gen_datasets(self, swipe_mode=False, test_iteration=0):
         testCopy = copy.deepcopy(self.cfg.get("tests", []))
         for test in testCopy:
             
@@ -273,14 +273,21 @@ class VerifItEnv:
 
                     # Iterate through parameters list
                     if "parameters" in test:
-                        for param in test['parameters']:
-                            param_name = param["name"]
-                            param_value = param["value"]
+                        if swipe_mode:
+                            swipe_parameters = verifit_util._get_swipe_parameters(test_iteration, test)
 
-                            # If the value is a list, take a random value from the range
-                            if isinstance(param_value, list):
-                                param_value = random.randint(param_value[0], param_value[1])
-                                param["value"] = param_value
+                        for param, parameter_index in enumerate(test['parameters']):
+                            param_name = param["name"]
+
+                            if not swipe_mode:
+                                param_value = param["value"]
+                                
+                                # If the value is a list, take a random value from the range
+                                if isinstance(param_value, list):
+                                    param_value = random.randint(param_value[0], param_value[1])
+                                    param["value"] = param_value
+                            else:
+                                param_value = swipe_parameters[parameter_index]
 
                             h_file.write(f"#define {param_name} {param_value}\n")
 

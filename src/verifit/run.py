@@ -7,7 +7,7 @@ import os
 import threading
 import queue
 
-def verifit_run(no_build=False, italian_mode=False):
+def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
     
     current_directory = os.getcwd()
 
@@ -39,7 +39,7 @@ def verifit_run(no_build=False, italian_mode=False):
         rich.print(" - [bold red]ERROR: Target project Makefile check failed![/bold red]")
         rich.print("   Please ensure that the Makefile contains the required targets")
         exit(1)
-    elif not run_util._configuration_check(data):
+    elif not run_util._configuration_check(data, swipe_mode):
         rich.print(" - [bold red]ERROR: there is an issue with config.ver critical parameters![/bold red]")
         exit(1)
     else:
@@ -125,6 +125,11 @@ def verifit_run(no_build=False, italian_mode=False):
     else:
         rich.print("[cyan]\nThrowing in the pasta...[/cyan]")
 
+    # If the test is to be run in "swipe mode", the ['target']['iteration'] in the .ver is overridden with
+    # the computed iterations needed to test every single combinations.
+    if swipe_mode:
+        total_swipe_iterations = data['']
+
     with Progress(
         TextColumn("[bold cyan]{task.description}"),
         BarColumn(),
@@ -141,8 +146,13 @@ def verifit_run(no_build=False, italian_mode=False):
         task = progress.add_task(task_message, total=data['target']['iterations'] * len(data['tests']), start=False)
         start = False
 
-        for test_iteration in range(data['target']['iterations']):
-            if not verEnv.gen_datasets():
+        if not swipe_mode:
+            test_iterations = range(data['target']['iterations'])
+        else:
+            test_iterations = run_util._get_tot_swipe_iterations(data)
+
+        for test_iteration in test_iterations:
+            if not verEnv.gen_datasets(swipe_mode, test_iteration):
               rich.print(f" - [bold red]ERROR: Dataset generation failed![/bold red]")
               exit(1)
 

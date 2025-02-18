@@ -63,7 +63,7 @@ def _update_time_estimation(progress, task_id):
         progress.refresh()
         time.sleep(0.2)  # Adjust this to control the update frequency
         
-def _configuration_check(configuration):
+def _configuration_check(configuration, swipe_mode):
     if configuration['target']['type'] not in ["sim", "fpga"]:
         rich.print("   [bold red]ERROR: Invalid target type![/bold red]")
         rich.print(f"   {configuration['target']['type']} is neither 'sim' nor 'fpga'")
@@ -72,5 +72,19 @@ def _configuration_check(configuration):
     if configuration['target']['type'] == "fpga" and (configuration['target']['usbPort'] == "" or configuration['target']['baudrate'] == ""): 
         rich.print("   [bold red]ERROR: invalid usbPort and/or baudrate![/bold red]")
         return False
+
+    if swipe_mode:
+        for test in configuration['tests']:
+            if not isinstance(test['parameters'], list):
+                rich.print("   [bold red]ERROR: swipe mode requires every test to have at least one dynamic parameter![/bold red]")
+                return False
     
     return True
+
+# Returns all the possible combinations of tests 
+def _get_tot_swipe_iterations(data):
+    tot = 1
+    for test in data['tests']:
+                for parameter in test['parameters']:
+                    tot *= abs(parameter['value'][0] - parameter['value'][1] + 1)
+    return tot
