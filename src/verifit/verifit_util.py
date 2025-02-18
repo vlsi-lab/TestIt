@@ -130,7 +130,7 @@ def _is_numpy_array(obj):
     return isinstance(obj, np.ndarray)
 
 def _run_command_threading(command):
-    thread = threading.Thread(target=_run_command, args=(command,))
+    thread = threading.Thread(target=_run_command, args=(command,), daemon=True)
     thread.start()
     return thread
 
