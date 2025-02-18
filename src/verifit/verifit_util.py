@@ -173,7 +173,7 @@ def _get_swipe_parameters(iteration, parameters):
     param_ranges = []
     
     for parameter in parameters:
-        param_ranges.append(tuple(parameter['value'][0], parameter['value'][1]))
+        param_ranges.append(tuple(parameter['value']))
 
     print(param_ranges)
     
