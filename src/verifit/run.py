@@ -177,13 +177,13 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
                     threading.Thread(target=run_util._update_time_estimation, args=(progress,task,), daemon=True).start()
                     start = True
                 
-                progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['appName']}", refresh=True)
+                progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{test_iterations}: {test['appName']}", refresh=True)
             
                 if swipe_mode:
                     test['currentIteration'] += 1
                     if test['currentIteration'] == test['totIterations']:
                         test_to_be_removed_name = test['appName']
-                        new_data = [p for p in data['tests'] if p['name'] != test_to_be_removed_name]
+                        new_data = [p for p in data['tests'] if p['appName'] != test_to_be_removed_name]
                         update_list_of_tests = True
             
             if update_list_of_tests:

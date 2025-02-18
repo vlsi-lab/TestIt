@@ -185,6 +185,4 @@ def _get_swipe_parameters(iteration, parameters):
         param_value = min_val + (iteration // step) % range_sizes[idx]
         values.append(param_value)
 
-    print(f"DONE: {values}")
-
     return values
