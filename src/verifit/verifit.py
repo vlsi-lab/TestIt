@@ -282,17 +282,16 @@ class VerifItEnv:
                             param_name = param["name"]
 
                             if not swipe_mode:
-                                param_value = param["value"]
                                 
-                                # If the value is a list, take a random value from the range
-                                if isinstance(param_value, list):
+                                # If the parameter's value is a list, take a random value from the range
+                                if isinstance(param["value"], list):
                                     param_value = random.randint(param_value[0], param_value[1])
                                     param["value"] = param_value
                             else:
                                 param["value"] = swipe_parameters[parameter_index]
                                 parameter_index += 1
 
-                            h_file.write(f"#define {param_name} {param_value}\n")
+                            h_file.write(f"#define {param_name} {param["value"]}\n")
 
                     h_file.write("\n")
 
