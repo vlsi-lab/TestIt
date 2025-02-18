@@ -135,7 +135,7 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
         
         # Compute the total test iterations
         if not swipe_mode:
-            test_iterations = range(data['target']['iterations'])
+            test_iterations = data['target']['iterations']
         else:
             swipe_test_iterations = run_util._get_tot_swipe_iterations(data)
 
@@ -146,9 +146,9 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
                 test_index += 1
 
             if isinstance(swipe_test_iterations, list):
-                test_iterations = range(max(swipe_test_iterations))
+                test_iterations = max(swipe_test_iterations)
             else:
-                test_iterations = range(swipe_test_iterations)
+                test_iterations = swipe_test_iterations
 
             rich.print("Swipe mode is active, VerifIt will cycle through each possible combination of parameters for each test")
             
@@ -158,10 +158,10 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
         else:
           task_message = " - Cooking..."
 
-        task = progress.add_task(task_message, total=data['target']['iterations'] * len(data['tests']), start=False)
+        task = progress.add_task(task_message, total=test_iterations, start=False)
         start = False
 
-        for test_iteration in test_iterations:
+        for test_iteration in range(test_iterations):
             if not verEnv.gen_datasets(swipe_mode, test_iteration):
               rich.print(f" - [bold red]ERROR: Dataset generation failed![/bold red]")
               exit(1)
