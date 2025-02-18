@@ -72,3 +72,5 @@ def _configuration_check(configuration):
     if configuration['target']['type'] == "fpga" and (configuration['target']['usbPort'] == "" or configuration['target']['baudrate'] == ""): 
         rich.print("   [bold red]ERROR: invalid usbPort and/or baudrate![/bold red]")
         return False
+    
+    return True
