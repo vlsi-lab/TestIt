@@ -146,6 +146,7 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
         task = progress.add_task(task_message, total=data['target']['iterations'] * len(data['tests']), start=False)
         start = False
 
+        # Compute the total test iterations
         if not swipe_mode:
             test_iterations = range(data['target']['iterations'])
         else:

@@ -254,7 +254,9 @@ class VerifItEnv:
     
     # This function generates datasets for every test insered in config.ver.
     # Both input and output datasets are written in a single file, "data.c" and "data.h".
-    def gen_datasets(self, swipe_mode=False, test_iteration=0):
+    def gen_datasets(self, swipe_mode=False, test_iteration=None):
+        print(test_iteration)
+        print(swipe_mode)
         testCopy = copy.deepcopy(self.cfg.get("tests", []))
         for test in testCopy:
             
