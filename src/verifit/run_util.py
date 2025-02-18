@@ -83,8 +83,11 @@ def _configuration_check(configuration, swipe_mode):
 
 # Returns all the possible combinations of tests 
 def _get_tot_swipe_iterations(data):
-    tot = 1
+    swipe_parameters = []
     for test in data['tests']:
-                for parameter in test['parameters']:
-                    tot *= abs(parameter['value'][0] - parameter['value'][1] + 1)
-    return tot
+        tot = 1
+        for parameter in test['parameters']:
+            tot *= abs(parameter['value'][0] - parameter['value'][1] + 1)
+        swipe_parameters.append(tot)
+
+    return swipe_parameters

@@ -132,6 +132,22 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
         SpinnerColumn(),   
         transient=True,
     ) as progress:
+        
+        # Compute the total test iterations
+        if not swipe_mode:
+            test_iterations = range(data['target']['iterations'])
+        else:
+            swipe_test_iterations = run_util._get_tot_swipe_iterations(data)
+
+            test_index = 0
+            for test in data['tests']:
+                test['totIterations'] = swipe_test_iterations[test_index]
+                test['currentIteration'] = 0
+                test_index += 1
+
+            test_iterations = max(swipe_test_iterations)
+            rich.print("Swipe mode is active, VerifIt will cycle through each possible combination of parameters for each test")
+            
         # Run the verification campaign
         if not italian_mode:
           task_message = " - Running tests..."
@@ -140,12 +156,6 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
 
         task = progress.add_task(task_message, total=data['target']['iterations'] * len(data['tests']), start=False)
         start = False
-
-        # Compute the total test iterations
-        if not swipe_mode:
-            test_iterations = range(data['target']['iterations'])
-        else:
-            test_iterations = run_util._get_tot_swipe_iterations(data)
 
         for test_iteration in test_iterations:
             if not verEnv.gen_datasets(swipe_mode, test_iteration):
@@ -160,9 +170,18 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
                     progress.start_task(task)
                     threading.Thread(target=run_util._update_time_estimation, args=(progress,task,), daemon=True).start()
                     start = True
-
+                
                 progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['appName']}", refresh=True)
-        
+            
+                if swipe_mode:
+                    test['currentIteration'] += 1
+                    if test['currentIteration'] == test['totIterations']:
+                        test_to_be_removed_name = test['appName']
+                        new_data = [p for p in data['tests'] if p['name'] != test_to_be_removed_name]
+            
+            if swipe_mode:
+                data['tests'] = new_data
+
         if data['target']['type'] == "fpga":
             verEnv.stop_deb()
 
