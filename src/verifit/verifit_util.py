@@ -4,6 +4,9 @@ import os
 import serial
 import numpy as np
 import sys
+import threading
+import subprocess
+import rich
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
@@ -125,3 +128,40 @@ def PRINT_DEB(*args, **kwargs):
 
 def _is_numpy_array(obj):
     return isinstance(obj, np.ndarray)
+
+def _run_command_threading(command):
+    thread = threading.Thread(target=_run_command, args=(command,))
+    thread.start()
+    return thread
+
+# If the command fails, the process will terminate and the script will exit
+def _run_command(command):
+    process = subprocess.Popen(
+        command,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        text=True,
+        shell=True
+    )
+
+    while True:
+        output = process.stdout.readline()
+        if output:
+            if "ERROR" in output or "Error" in output or "error" in output:
+                process.terminate()
+                process.wait()
+                rich.print(f"CRITICAL ERROR: {output} failed!")
+                os._exit(1)
+            
+        error_output = process.stderr.readline()
+        if error_output:
+            process.terminate()
+            process.wait()
+            rich.print(f"CRITICAL ERROR: {output} failed!")
+            os._exit(1)
+        
+        # Check if process is still running
+        if process.poll() is not None:
+            break  # Exit loop when process completes
+
+    process.wait()  # Ensure process is fully done before exiting

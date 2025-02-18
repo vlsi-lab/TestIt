@@ -3,6 +3,10 @@ import os
 import re
 import importlib_resources as resources
 import shutil
+import time
+import subprocess
+import threading
+import rich
 
 # Set this to True to enable debugging prints
 DEBUG_MODE = False # TODO: REMOVE THIS LINE BEFORE RELEASE
@@ -52,3 +56,10 @@ def __extract_makefile_targets():
                 targets.append(match.group(1))
                 
     return targets
+
+# Background thread to update time estimation frequently
+def _update_time_estimation(progress, task_id):
+    while not progress.tasks[task_id].finished:
+        progress.refresh()
+        time.sleep(1)  # Adjust this to control the update frequency
+        

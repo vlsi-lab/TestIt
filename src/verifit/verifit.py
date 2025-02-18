@@ -83,9 +83,11 @@ class VerifItEnv:
         
         return True
             
+    def setup_deb(self):
+        verifit_util._run_command_threading(f"make deb-setup")
 
     # Set-up GDB
-    def setup_deb(self):
+    def setup_gdb(self):
         gdb_cmd = f"""
         cd {os.getcwd()}
         make deb-setup

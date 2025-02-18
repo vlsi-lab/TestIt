@@ -4,6 +4,8 @@ from rich.status import Status
 import rich
 from . import verifit
 import os
+import threading
+import queue
 
 def verifit_run(no_build=False, italian_mode=False):
     
@@ -96,13 +98,15 @@ def verifit_run(no_build=False, italian_mode=False):
                 rich.print(" - Serial setup [bold green][OK][/bold green]")
             else:
                 rich.print(" - Pelati [bold green][OPENED][/bold green]")
+        
+        verEnv.setup_deb()
 
         if not italian_mode:
             with Status(" [cyan]Setting up GDB...[/cyan]", spinner="dots") as status:
-                gdb_setup_success = verEnv.setup_deb()
+                gdb_setup_success = verEnv.setup_gdb()
         else:
             with Status(" [cyan]Cooking the pomodoro sauce...[/cyan]", spinner="dots") as status:
-                gdb_setup_success = verEnv.setup_deb()
+                gdb_setup_success = verEnv.setup_gdb()
 
         if not gdb_setup_success:
             rich.print(" - [bold red]ERROR: GDB setup failed![/bold red]")
@@ -145,6 +149,7 @@ def verifit_run(no_build=False, italian_mode=False):
                     exit(1)
                 if not start:
                     progress.start_task(task)
+                    threading.Thread(target=run_util._update_time_estimation, args=(progress,task,), daemon=True).start()
                     start = True
 
                 progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['appName']}", refresh=True)
