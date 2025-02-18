@@ -145,7 +145,9 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
                 test['currentIteration'] = 0
                 test_index += 1
 
-            test_iterations = max(swipe_test_iterations)
+            print(data['tests'])
+
+            test_iterations = range(max(swipe_test_iterations))
             rich.print("Swipe mode is active, VerifIt will cycle through each possible combination of parameters for each test")
             
         # Run the verification campaign
