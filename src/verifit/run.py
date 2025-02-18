@@ -125,11 +125,6 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
     else:
         rich.print("[cyan]\nThrowing in the pasta...[/cyan]")
 
-    # If the test is to be run in "swipe mode", the ['target']['iteration'] in the .ver is overridden with
-    # the computed iterations needed to test every single combinations.
-    if swipe_mode:
-        total_swipe_iterations = data['']
-
     with Progress(
         TextColumn("[bold cyan]{task.description}"),
         BarColumn(),

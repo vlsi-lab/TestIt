@@ -255,8 +255,6 @@ class VerifItEnv:
     # This function generates datasets for every test insered in config.ver.
     # Both input and output datasets are written in a single file, "data.c" and "data.h".
     def gen_datasets(self, swipe_mode=False, test_iteration=None):
-        print(test_iteration)
-        print(swipe_mode)
         testCopy = copy.deepcopy(self.cfg.get("tests", []))
         for test in testCopy:
             
@@ -279,6 +277,8 @@ class VerifItEnv:
                             swipe_parameters = verifit_util._get_swipe_parameters(test_iteration, test)
 
                         for param, parameter_index in enumerate(test['parameters']):
+                            print(param)
+                            print(parameter_index)
                             param_name = param["name"]
 
                             if not swipe_mode:
