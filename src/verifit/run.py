@@ -139,6 +139,8 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
         else:
             swipe_test_iterations = run_util._get_tot_swipe_iterations(data)
 
+            print(swipe_test_iterations)
+
             test_index = 0
             for test in data['tests']:
                 test['totIterations'] = swipe_test_iterations[test_index]
