@@ -61,7 +61,6 @@ def __extract_makefile_targets():
 def _update_time_estimation(progress, task_id):
     while not progress.tasks[task_id].finished:
         progress.refresh()
-        print("-")
         time.sleep(0.2)  # Adjust this to control the update frequency
         
 def _configuration_check(configuration):
@@ -69,4 +68,7 @@ def _configuration_check(configuration):
         rich.print("   [bold red]ERROR: Invalid target type![/bold red]")
         rich.print(f"   {configuration['target']['type']} is neither 'sim' nor 'fpga'")
         return False
-    
+
+    if configuration['target']['type'] == "fpga" and (configuration['target']['usbPort'] == "" or configuration['target']['baudrate'] == ""): 
+        rich.print("   [bold red]ERROR: invalid usbPort and/or baudrate![/bold red]")
+        return False

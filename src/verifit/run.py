@@ -35,23 +35,26 @@ def verifit_run(no_build=False, italian_mode=False):
       rich.print("[cyan]Bringing salted water to boil...[/cyan]")
 
     # Check the presence of the required Makefile targets
-    if not run_util._makefile_target_check() :
+    if not run_util._makefile_target_check():
         rich.print(" - [bold red]ERROR: Target project Makefile check failed![/bold red]")
-        rich.print(" - Please ensure that the Makefile contains the required targets")
+        rich.print("   Please ensure that the Makefile contains the required targets")
+        exit(1)
+    elif not run_util._configuration_check(data):
+        rich.print(" - [bold red]ERROR: there is an issue with config.ver critical parameters![/bold red]")
         exit(1)
     else:
         if not italian_mode:
-            rich.print(" - Target project Makefile sanity check [bold green][OK][/bold green]")
+            rich.print(" - Target project Makefile and config.ver check [bold green][OK][/bold green]")
         else:
             rich.print(" - Nonna's recipe [bold green][READ][/bold green]")
 
     if not no_build:
         # Build the model
         if not italian_mode:
-            with Status(" [cyan]Building model...[/cyan]", spinner="dots") as status:
+            with Status(" - [cyan]Building model...[/cyan]", spinner="dots") as status:
                 build_success = verEnv.build_model()
         else:
-            with Status(" [cyan]Cutting onions...[/cyan]", spinner="dots") as status:
+            with Status(" - [cyan]Cutting onions...[/cyan]", spinner="dots") as status:
                 build_success = verEnv.build_model()
 
         if not build_success:
@@ -66,10 +69,10 @@ def verifit_run(no_build=False, italian_mode=False):
     # If the target is an FPGA board, load the bitstream, then setup the serial connection and GDB
     if data['target']['type'] == "fpga":
         if not italian_mode:
-            with Status(f" [cyan]Loading model on FPGA board {data['target']['name']}...[/cyan]", spinner="dots") as status:
-                load_success = verEnv.load_fpga_model()   
+            with Status(f" - [cyan]Loading model on FPGA board {data['target']['name']}...[/cyan]", spinner="dots") as status:
+                load_success = verEnv.load_fpga_model()
         else:
-            with Status(f" [cyan]Frying the onions in a pan...[/cyan]", spinner="dots") as status:
+            with Status(f" - [cyan]Frying the onions in a pan...[/cyan]", spinner="dots") as status:
                 load_success = verEnv.load_fpga_model() 
 
         if not load_success:
@@ -83,10 +86,10 @@ def verifit_run(no_build=False, italian_mode=False):
                 rich.print(f" - Soffritto {data['target']['name']} [bold green][DONE][/bold green]")     
 
         if not italian_mode:
-            with Status(" [cyan]Setting up serial connection...[/cyan]", spinner="dots") as status:
+            with Status(" - [cyan]Setting up serial connection...[/cyan]", spinner="dots") as status:
                 serial_setup_success = verEnv.serial_begin()
         else:
-            with Status(" [cyan]Opening a couple of pelati cans...[/cyan]", spinner="dots") as status:
+            with Status(" - [cyan]Opening a couple of pelati cans...[/cyan]", spinner="dots") as status:
                 serial_setup_success = verEnv.serial_begin()
         
         if not serial_setup_success:
@@ -102,10 +105,10 @@ def verifit_run(no_build=False, italian_mode=False):
         verEnv.setup_deb()
 
         if not italian_mode:
-            with Status(" [cyan]Setting up GDB...[/cyan]", spinner="dots") as status:
+            with Status(" - [cyan]Setting up GDB...[/cyan]", spinner="dots") as status:
                 gdb_setup_success = verEnv.setup_gdb()
         else:
-            with Status(" [cyan]Cooking the pomodoro sauce...[/cyan]", spinner="dots") as status:
+            with Status(" - [cyan]Cooking the pomodoro sauce...[/cyan]", spinner="dots") as status:
                 gdb_setup_success = verEnv.setup_gdb()
 
         if not gdb_setup_success:
