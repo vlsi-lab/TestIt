@@ -183,11 +183,11 @@ def verifit_setup():
         rich.print("Generation of 'config.ver' [bold green][OK][/bold green]")
 
 # Generates a report of the last verification campaign
-def verifit_report():
+def verifit_report(sort_key, ascending):
     # Load the configuration file
     data = run_util._load_config()
 
     # Create the VerifIt object
     verEnv = verifit.VerifItEnv(data)
 
-    verEnv.gen_report()
+    verEnv.gen_report(sort_key, ascending)

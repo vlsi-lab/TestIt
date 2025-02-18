@@ -221,31 +221,34 @@ class VerifItEnv:
         verifit_util._append_results_to_report(self.cfg['report']['dir'], app_name, iteration, result_dict)
         return True
 
-    # Generate a report of the last verification campaign
-    def gen_report(self):
+    # Generate a report of the last verification campaign.
+    def gen_report(self, sort_key=None, ascending=True):
         console = Console(record=True)
 
-        # Load results
         with open(f"{self.cfg['report']['dir']}/test_results.json", "r") as f:
             results = json.load(f)
 
         for test_name, iterations in results.items():
-            # Create a new table for each test
+           
             table = Table(title=f"Test Report: {test_name}")
 
-            # Add columns dynamically based on the first entry
             if iterations:
                 for key in iterations[0].keys():
                     table.add_column(key, style="cyan")
 
-                # Add data rows
-                for entry in iterations:
-                    table.add_row(*[str(entry[key]) for key in entry])
+                if sort_key and sort_key in iterations[0]:
+                    try:
+                        # Try numeric sorting first
+                        iterations.sort(key=lambda x: int(x[sort_key]), reverse=not ascending)
+                    except ValueError:
+                        # Fallback to string sorting
+                        iterations.sort(key=lambda x: x[sort_key], reverse=not ascending)
 
-                # Print the table to the console and store it
-                console.print(table)
+            for entry in iterations:
+                table.add_row(*[str(entry[key]) for key in entry])
 
-        # Save the report to a file
+            console.print(table)
+
         with open(f"{self.cfg['report']['dir']}/report.rpt", "w") as f:
             f.write(console.export_text())
     
