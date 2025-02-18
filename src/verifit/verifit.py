@@ -289,7 +289,7 @@ class VerifItEnv:
                                     param_value = random.randint(param_value[0], param_value[1])
                                     param["value"] = param_value
                             else:
-                                param_value = swipe_parameters[parameter_index]
+                                param["value"] = swipe_parameters[parameter_index]
                                 parameter_index += 1
 
                             h_file.write(f"#define {param_name} {param_value}\n")
