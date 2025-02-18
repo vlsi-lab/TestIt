@@ -166,6 +166,8 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
               rich.print(f" - [bold red]ERROR: Dataset generation failed![/bold red]")
               exit(1)
 
+            update_list_of_tests = False
+
             for test in data['tests']:
                 if not verEnv.launch_test(app_name=test['appName'], iteration=test_iteration, pattern=rf"{test['outputFormat']}", output_tags=test['outputTags'], timeout_t=1000):
                     rich.print(f" - [bold red]ERROR: Test {test['appName']} failed because of GDB timeout[/bold red]")
@@ -182,8 +184,9 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
                     if test['currentIteration'] == test['totIterations']:
                         test_to_be_removed_name = test['appName']
                         new_data = [p for p in data['tests'] if p['name'] != test_to_be_removed_name]
+                        update_list_of_tests = True
             
-            if swipe_mode:
+            if update_list_of_tests:
                 data['tests'] = new_data
 
         if data['target']['type'] == "fpga":
