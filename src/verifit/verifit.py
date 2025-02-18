@@ -26,13 +26,8 @@ def PRINT_DEB(*args, **kwargs):
 class VerifItEnv:
     def __init__(self, config):
         self.cfg = config
-        self.results = []
-        self.it_times = []
-        verifit_util._clear_database(self.cfg['report']['dir'])
 
     def reset_all(self):
-        self.results = []
-        self.it_times = []
         if self.serial_comm_instance.is_open:
           self.serial_comm_instance.close()
         self.serial_comm_instance = None
@@ -42,7 +37,7 @@ class VerifItEnv:
         self.project_root = None
 
     def clear_results(self):
-        self.results = []
+        verifit_util._clear_database(self.cfg['report']['dir'])
     
     # Build the model for the simulation tool or the FPGA board
     def build_model(self):
@@ -101,7 +96,7 @@ class VerifItEnv:
         self.gdb.expect('(gdb)')
         self.gdb.sendline('set remotetimeout 2000')
         self.gdb.expect('(gdb)')
-        self.gdb.sendline('target remote localhost:3333')
+        self.gdb.sendline('target extended-remote localhost:3333')
         self.gdb.expect('(gdb)')
 
         if self.gdb.isalive():

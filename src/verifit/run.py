@@ -23,6 +23,8 @@ def verifit_run(no_build=False, italian_mode=False):
 
     # Create the VerifIt object
     verEnv = verifit.VerifItEnv(data)
+
+    verEnv.clear_results()
     
     if not italian_mode:
       rich.print("[cyan]Setting up VerifIt project...[/cyan]")
@@ -147,6 +149,8 @@ def verifit_run(no_build=False, italian_mode=False):
 
                 progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{data['target']['iterations']}: {test['appName']}", refresh=True)
         
+        verEnv.stop_deb()
+
         if not italian_mode:
             rich.print(" - All tests [bold green][RAN][/bold green]")
             rich.print("\nVerifIt campaign completed!")
