@@ -168,21 +168,35 @@ def __run_command(command):
     process.wait()  # Ensure process is fully done before exiting
 
 def _get_swipe_parameters(iteration, parameters):
-    values = []
+    swipe_parameters = []
     range_sizes = []
     param_ranges = []
+    complete_parameters = []
+    steps = []
     
     for parameter in parameters:
-        param_ranges.append(tuple(parameter['value']))
+        if isinstance(parameter['value'], list):
+            param_ranges.append(tuple(parameter['value']))
+            steps.append(parameter['step'])
     
     # Compute range sizes
     for min_val, max_val in param_ranges:
         size = max_val - min_val + 1
         range_sizes.append(size)
 
-    for idx, (min_val, _) in enumerate(param_ranges):
-        step = 1 if idx == 0 else step * range_sizes[idx - 1]
-        param_value = min_val + (iteration // step) % range_sizes[idx]
-        values.append(param_value)
+    step_product = 1
+    for idx, ((min_val, _), step) in enumerate(zip(param_ranges, steps)):
+        if idx > 0:
+            step_product *= range_sizes[idx - 1]
+        param_value = min_val + ((iteration // step_product) % range_sizes[idx]) * step
+        swipe_parameters.append(param_value)
+    
+    swipe_index = 0
+    for i in range(len(parameters)):
+        if isinstance(parameter['value'], list):
+            complete_parameters.append(swipe_parameters[swipe_index])
+            swipe_index += 1
+        else:
+            complete_parameters.append(parameter['value'])
 
-    return values
+    return complete_parameters

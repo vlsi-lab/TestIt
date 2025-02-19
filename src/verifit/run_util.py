@@ -75,9 +75,14 @@ def _configuration_check(configuration, swipe_mode):
 
     if swipe_mode:
         for test in configuration['tests']:
-            if not isinstance(test['parameters'], list):
+            if not any(isinstance(param["value"], list) for param in test["parameters"]):
                 rich.print("   [bold red]ERROR: swipe mode requires every test to have at least one dynamic parameter![/bold red]")
                 return False
+            for param in test["parameters"]:
+              if isinstance(param['value'], list):
+                  if not any('step' in param) or not isinstance(param['step'], int):
+                      rich.print("   [bold red]ERROR: with swipe mode, each parameter requires a 'step' parameter to be defined as an integer![/bold red]")
+                      return False
     
     return True
 
@@ -87,7 +92,8 @@ def _get_tot_swipe_iterations(data):
     for test in data['tests']:
         tot = 1
         for parameter in test['parameters']:
-            tot *= abs(parameter['value'][0] - parameter['value'][1]) + 1
+            if isinstance(parameter['value'], list):
+                tot *= int(abs(parameter['value'][0] - parameter['value'][1])/parameter['step']) + 1
         swipe_parameters.append(tot)
 
     return swipe_parameters
