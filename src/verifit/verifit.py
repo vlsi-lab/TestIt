@@ -268,13 +268,14 @@ class VerifItEnv:
             try:
                 with open(f"{test_dir}/{test['genFilesName']}.h", 'w') as h_file, open(f"{test_dir}/{test['genFilesName']}.c", 'w') as c_file:
                     
-                    h_file.write("#ifndef VER_DATA_H\n")
-                    h_file.write("#define VER_DATA_H\n\n")
+                    h_file.write("#ifndef TEST_DATA_H\n")
+                    h_file.write("#define TEST_DATA_H\n\n")
                     h_file.write("#include <stdint.h>\n\n")
 
                     # Iterate through parameters list
                     if "parameters" in test:
                         if swipe_mode:
+                            print(test['parameters'])
                             swipe_parameters = verifit_util._get_swipe_parameters(test_iteration, test['parameters'])
                             print(swipe_parameters)
                        
@@ -294,7 +295,6 @@ class VerifItEnv:
                                 parameter_index += 1
 
                             param_value = param["value"]
-                            print(f"{param_name},{param_value},{test_iteration}")
                             h_file.write(f"#define {param_name} {param_value}\n")
 
                     h_file.write("\n")
@@ -397,7 +397,7 @@ class VerifItEnv:
                             c_file.write("};\n\n")
 
                     # Close Header File
-                    h_file.write("\n#endif // VER_DATA_H\n")
+                    h_file.write("\n#endif // TEST_DATA_H\n")
             except Exception as e:
                 print(f"ERROR: {e}")
                 return False
