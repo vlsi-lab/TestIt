@@ -1,5 +1,5 @@
 # This is a template for the golden function(s) that can be used to define the expected behaviour 
-# of VerifIt tests. The golden function(s) should use the NumPy library, as VerifIt produces NumPy tensors
+# of TestIt tests. The golden function(s) should use the NumPy library, as TestIt produces NumPy tensors
 # as input data and expects NumPy tensors as output data. 
 
 import numpy as np

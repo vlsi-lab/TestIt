@@ -2,7 +2,7 @@ import argparse
 from . import run
 
 def main():
-    parser = argparse.ArgumentParser(description="VeriFit CLI tool")
+    parser = argparse.ArgumentParser(description="TestIt CLI tool")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # Define subparsers for individual commands
@@ -46,11 +46,11 @@ def main():
     args = parser.parse_args()
 
     if args.command == "run":
-        run.verifit_run(args.nobuild, args.mammamia, args.swipe)
+        run.testit_run(args.nobuild, args.mammamia, args.swipe)
     elif args.command == "setup":
-        run.verifit_setup()
+        run.testit_setup()
     elif args.command == "report":
-        run.verifit_report(args.sort_key, not args.descending)
+        run.testit_report(args.sort_key, not args.descending)
 
 if __name__ == "__main__":
     main()

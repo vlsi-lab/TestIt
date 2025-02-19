@@ -7,7 +7,7 @@ import queue
 import random
 import os
 import numpy as np
-from . import verifit_util
+from . import testit_util
 from rich.console import Console
 from rich.table import Table
 import json
@@ -23,7 +23,7 @@ def PRINT_DEB(*args, **kwargs):
         print(*args, **kwargs)
 
 # This class defines the environment for the verification campaign
-class VerifItEnv:
+class TestItEnv:
     def __init__(self, config):
         self.cfg = config
 
@@ -37,7 +37,7 @@ class VerifItEnv:
         self.project_root = None
 
     def clear_results(self):
-        verifit_util._clear_database(self.cfg['report']['dir'])
+        testit_util._clear_database(self.cfg['report']['dir'])
     
     # Build the model for the simulation tool or the FPGA board
     def build_model(self):
@@ -84,7 +84,7 @@ class VerifItEnv:
         return True
             
     def setup_deb(self):
-        verifit_util._run_command_threading(f"make deb-setup")
+        testit_util._run_command_threading(f"make deb-setup")
 
     # Set-up GDB
     def setup_gdb(self):
@@ -129,7 +129,7 @@ class VerifItEnv:
             if not self.serial_comm_instance.is_open:
                 print("ERROR: Serial port is not open!")
                 exit(1) 
-            self.serial_comm_thread = threading.Thread(target=verifit_util._serial_rx_setup, args=(self.serial_comm_instance, self.serial_comm_queue))
+            self.serial_comm_thread = threading.Thread(target=testit_util._serial_rx_setup, args=(self.serial_comm_instance, self.serial_comm_queue))
 
             self.serial_comm_thread.start()
 
@@ -219,7 +219,7 @@ class VerifItEnv:
                 result_dict = {output_tags[i]: matched_data[i] for i in range(len(matched_data))}
                 output_matches.append(result_dict)
                 
-        verifit_util._append_results_to_report(self.cfg['report']['dir'], app_name, iteration, output_matches)
+        testit_util._append_results_to_report(self.cfg['report']['dir'], app_name, iteration, output_matches)
         return True
 
     # Generate a report of the last verification campaign.
@@ -275,7 +275,7 @@ class VerifItEnv:
                     # Iterate through parameters list
                     if "parameters" in test:
                         if swipe_mode:
-                            swipe_parameters = verifit_util._get_swipe_parameters(test_iteration, test['parameters'])
+                            swipe_parameters = testit_util._get_swipe_parameters(test_iteration, test['parameters'])
                        
                         parameter_index = 0
                         for param in test['parameters']:
@@ -358,7 +358,7 @@ class VerifItEnv:
                             c_file.write(f"const {datatype} {dataset_name}[{total_size}]" + " = {\n")
                             
                             # Write the golden result array with formatting
-                            verifit_util._write_array(c_file, input_array, dataset_shape)
+                            testit_util._write_array(c_file, input_array, dataset_shape)
 
                             c_file.write("};\n\n")
 
@@ -371,11 +371,11 @@ class VerifItEnv:
                     # Output datasets are not mandatory
                     if output_datasets:
                         # Generate the golden results using the golden function
-                        golden_function = verifit_util._dyn_load_func(test["goldenResultFunction"]["name"])
+                        golden_function = testit_util._dyn_load_func(test["goldenResultFunction"]["name"])
                         golden_results = golden_function(input_arrays, test["parameters"])
 
                         # Ensure golden_results is a list (it might be a single array)
-                        if verifit_util._is_numpy_array(golden_results):
+                        if testit_util._is_numpy_array(golden_results):
                             golden_results = [golden_results]
 
                         # Write the golden result
@@ -390,7 +390,7 @@ class VerifItEnv:
                             c_file.write(f"const {output_datatype} {output_name}[{total_size}]" + " = {\n")
 
                             # Write the golden result array with formatting
-                            verifit_util._write_array(c_file, golden_result, output_shape)
+                            testit_util._write_array(c_file, golden_result, output_shape)
 
                             c_file.write("};\n\n")
 

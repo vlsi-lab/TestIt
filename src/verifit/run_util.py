@@ -37,7 +37,7 @@ def _makefile_target_check():
 
 # Copies a file from the package directory to the current working directory
 def _copy_package_file(filename):
-    resource_path = resources.files("verifit") / filename
+    resource_path = resources.files("testit") / filename
     shutil.copy(resource_path, os.getcwd())
     
 # Checks if a specific target exists in the target project Makefile

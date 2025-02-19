@@ -2,12 +2,12 @@ from . import run_util
 from rich.progress import Progress, BarColumn, TimeRemainingColumn, TextColumn, SpinnerColumn
 from rich.status import Status
 import rich
-from . import verifit
+from . import testit
 import os
 import threading
 import queue
 
-def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
+def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
     
     current_directory = os.getcwd()
 
@@ -18,18 +18,18 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
         rich.print("Please run the 'setup' command first.")
         exit(1)
     
-    if not os.path.exists(f"{current_directory}/verifit_golden.py"):
-        rich.print("[bold red]ERROR: verifit_golden.py not found![/bold red")
+    if not os.path.exists(f"{current_directory}/testit_golden.py"):
+        rich.print("[bold red]ERROR: testit_golden.py not found![/bold red")
         rich.print("Please run the 'setup' command first.")
         exit(1)    
 
-    # Create the VerifIt object
-    verEnv = verifit.VerifItEnv(data)
+    # Create the TestIt object
+    verEnv = testit.TestItEnv(data)
 
     verEnv.clear_results()
     
     if not italian_mode:
-      rich.print("[cyan]Setting up VerifIt project...[/cyan]")
+      rich.print("[cyan]Setting up TestIt project...[/cyan]")
     else:
       rich.print("\n[bold green][][/bold green][white][][/white][bold red][][/bold red]\n")
       rich.print("[cyan]Bringing salted water to boil...[/cyan]")
@@ -150,7 +150,7 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
             else:
                 test_iterations = swipe_test_iterations
 
-            rich.print("Swipe mode is active, VerifIt will cycle through each possible combination of parameters for each test")
+            rich.print("Swipe mode is active, TestIt will cycle through each possible combination of parameters for each test")
             
         # Run the verification campaign
         if not italian_mode:
@@ -194,19 +194,19 @@ def verifit_run(no_build=False, italian_mode=False, swipe_mode=False):
 
         if not italian_mode:
             rich.print(" - All tests [bold green][RAN][/bold green]")
-            rich.print("\nVerifIt campaign [bold green]completed![/bold green]")
+            rich.print("\nTestIt campaign [bold green]completed![/bold green]")
         else:
             rich.print(" - Pasta [bold green][COOKED][/bold green]")
             rich.print("\n[bold green]A tavola![/bold green]")
 
-# If necessary, generates the necessary files for the VerifIt package: verifit_golden.py and config.ver
-def verifit_setup():
+# If necessary, generates the necessary files for the TestIt package: testit_golden.py and config.ver
+def testit_setup():
     current_directory = os.getcwd()
-    if os.path.exists(f"{current_directory}/verifit_golden.py"):
-        rich.print("[yellow]WARNING: 'verifit_golden.py' already exists in the current directory.[/yellow]")    
+    if os.path.exists(f"{current_directory}/testit_golden.py"):
+        rich.print("[yellow]WARNING: 'testit_golden.py' already exists in the current directory.[/yellow]")    
     else: 
-        run_util._copy_package_file("templates/verifit_golden.py")
-        rich.print("Generation of 'verifit_golden.py' [bold green][OK][/bold green]")
+        run_util._copy_package_file("templates/testit_golden.py")
+        rich.print("Generation of 'testit_golden.py' [bold green][OK][/bold green]")
     
     if os.path.exists(f"{current_directory}/config.ver"):
         rich.print("[yellow]WARNING: 'config.ver' already exists in the current directory.[/yellow]")
@@ -215,11 +215,11 @@ def verifit_setup():
         rich.print("Generation of 'config.ver' [bold green][OK][/bold green]")
 
 # Generates a report of the last verification campaign
-def verifit_report(sort_key, ascending):
+def testit_report(sort_key, ascending):
     # Load the configuration file
     data = run_util._load_config()
 
-    # Create the VerifIt object
-    verEnv = verifit.VerifItEnv(data)
+    # Create the TestIt object
+    verEnv = testit.TestItEnv(data)
 
     verEnv.gen_report(sort_key, ascending)

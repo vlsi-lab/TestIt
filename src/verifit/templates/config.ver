@@ -1,7 +1,7 @@
 {
   target:
   {
-    name: "fpga_board_name" # or "simulation_tool_name", must be one of the targets defined in "verifit.mk"
+    name: "fpga_board_name" # or "simulation_tool_name", must be one of the targets defined in "testit.mk"
     type: "fpga" # or "sim", MANDATORY
     outputFormat: "(\\d+):(\\d+):(\\d+)" # Regular expression that defines the format of the output of the target
                                          # e.g. (testId:executionTime:testOutcome)
@@ -56,7 +56,7 @@
       }
 
       goldenResultFunction: {
-        name: "exampleFunction" # It must be included in the verifit_golden.py that must be present in the root of the target folder
+        name: "exampleFunction" # It must be included in the testit_golden.py that must be present in the root of the target folder
         dataType: "int"
       }
     }

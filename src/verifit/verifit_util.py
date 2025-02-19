@@ -77,9 +77,9 @@ def _append_results_to_report(dir, test_name, iteration, results):
     with open(f"{dir}/test_results.json", "w") as file:
         json.dump(db, file, indent=4)
 
-# Dynamically load a function from 'verifit_golden.py'
+# Dynamically load a function from 'testit_golden.py'
 def _dyn_load_func(function_name):
-    module_name = "verifit_golden"
+    module_name = "testit_golden"
     module_path = os.path.join(os.getcwd(), f"{module_name}.py")
 
     if not os.path.exists(module_path):
