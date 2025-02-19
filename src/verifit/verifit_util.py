@@ -180,15 +180,10 @@ def _get_swipe_parameters(iteration, parameters):
             param_ranges.append(tuple(parameter['value']))
             steps.append(parameter['step'])
     
-    print("\n")
-    print(param_ranges)
-
     # Compute range sizes
-    for min_val, max_val in param_ranges:
-        size = max_val - min_val + 1
+    for (min_val, max_val), step in zip(param_ranges, steps):
+        size = (max_val - min_val) // step + 1
         range_sizes.append(size)
-    
-    print(range_sizes)
 
     step_product = 1
     for idx, ((min_val, _), step) in enumerate(zip(param_ranges, steps)):
