@@ -292,8 +292,8 @@ class VerifItEnv:
                                 param["value"] = swipe_parameters[parameter_index]
                                 parameter_index += 1
 
-                            print(f"{param_name},{param_value},{iteration}")
                             param_value = param["value"]
+                            print(f"{param_name},{param_value},{iteration}")
                             h_file.write(f"#define {param_name} {param_value}\n")
 
                     h_file.write("\n")
