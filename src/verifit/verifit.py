@@ -275,9 +275,7 @@ class VerifItEnv:
                     # Iterate through parameters list
                     if "parameters" in test:
                         if swipe_mode:
-                            print(test['parameters'])
                             swipe_parameters = verifit_util._get_swipe_parameters(test_iteration, test['parameters'])
-                            print(swipe_parameters)
                        
                         parameter_index = 0
                         for param in test['parameters']:
