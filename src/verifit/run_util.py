@@ -95,5 +95,5 @@ def _get_tot_swipe_iterations(data):
             if isinstance(parameter['value'], list):
                 tot *= int(abs(parameter['value'][0] - parameter['value'][1])/parameter['step']) + 1
         swipe_parameters.append(tot)
-
+    
     return swipe_parameters

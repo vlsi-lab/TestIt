@@ -192,11 +192,11 @@ def _get_swipe_parameters(iteration, parameters):
         swipe_parameters.append(param_value)
     
     swipe_index = 0
-    for i in range(len(parameters)):
-        if isinstance(parameter['value'], list):
+    for param in len(parameters):
+        if isinstance(param['value'], list):
             complete_parameters.append(swipe_parameters[swipe_index])
             swipe_index += 1
         else:
-            complete_parameters.append(parameter['value'])
+            complete_parameters.append(param['value'])
 
     return complete_parameters
