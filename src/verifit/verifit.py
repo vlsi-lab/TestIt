@@ -293,7 +293,7 @@ class VerifItEnv:
                                 parameter_index += 1
 
                             param_value = param["value"]
-                            print(f"{param_name},{param_value},{iteration}")
+                            print(f"{param_name},{param_value},{test_iteration}")
                             h_file.write(f"#define {param_name} {param_value}\n")
 
                     h_file.write("\n")
