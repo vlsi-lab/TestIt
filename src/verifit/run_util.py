@@ -80,7 +80,7 @@ def _configuration_check(configuration, swipe_mode):
                 return False
             for param in test["parameters"]:
               if isinstance(param['value'], list):
-                  if not any('step' in param) or not isinstance(param['step'], int):
+                  if 'step' not in param or not isinstance(param['step'], int):
                       rich.print("   [bold red]ERROR: with swipe mode, each parameter requires a 'step' parameter to be defined as an integer![/bold red]")
                       return False
     
