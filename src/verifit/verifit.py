@@ -296,7 +296,7 @@ class VerifItEnv:
 
                     h_file.write("\n")
 
-                    c_file.write('#include "data.h"\n\n')
+                    c_file.write(f'#include "{test['genFilesName']}.h"\n\n')
 
                     input_datasets = test.get("inputDataset", [])
 
