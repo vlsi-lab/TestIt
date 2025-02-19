@@ -308,6 +308,7 @@ class VerifItEnv:
                     
                     if input_datasets:
                         print("AAAAAAA")
+                        print(input_datasets)
                         for dataset in input_datasets:
                             dataset_name = dataset["name"]
                             datatype = dataset["dataType"]
