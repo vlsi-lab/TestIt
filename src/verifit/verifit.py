@@ -305,58 +305,59 @@ class VerifItEnv:
                     c_file.write('#include "data.h"\n\n')
 
                     input_arrays = []
+                    
+                    if input_datasets:
+                        for dataset in input_datasets:
+                            dataset_name = dataset["name"]
+                            datatype = dataset["dataType"]
+                            value_range = dataset["valueRange"]
+                            dimensions = dataset["dimensions"]
 
-                    for dataset in input_datasets:
-                        dataset_name = dataset["name"]
-                        datatype = dataset["dataType"]
-                        value_range = dataset["valueRange"]
-                        dimensions = dataset["dimensions"]
+                            # Handle parameter-dependent dimensions
+                            converted_dimensions = []
+                            for dim in dimensions:
+                                if isinstance(dim, str):
+                                    dim = next((p["value"] for p in test['parameters'] if p["name"] == dim), 1)
+                                converted_dimensions.append(dim)
 
-                        # Handle parameter-dependent dimensions
-                        converted_dimensions = []
-                        for dim in dimensions:
-                            if isinstance(dim, str):
-                                dim = next((p["value"] for p in test['parameters'] if p["name"] == dim), 1)
-                            converted_dimensions.append(dim)
+                            dataset_shape = tuple(converted_dimensions)
 
-                        dataset_shape = tuple(converted_dimensions)
+                            # Generate a NumPy array with the correct shape and datatype
+                            if datatype == "uint8_t":
+                                input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint8)
+                            elif datatype == "uint16_t":
+                                input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint16)
+                            elif datatype == "uint32_t":
+                                input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint32)
+                            elif datatype == "uint64_t":
+                                input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint64)
+                            elif datatype == "int8_t":
+                                input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int8)
+                            elif datatype == "int16_t":
+                                input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int16)
+                            elif datatype == "int32_t":
+                                input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int32)
+                            elif datatype == "int64_t":
+                                input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int64)
+                            elif datatype == "float":
+                                input_array = np.random.uniform(value_range[0], value_range[1], size=dataset_shape).astype(np.float32)
+                            elif datatype == "double":
+                                input_array = np.random.uniform(value_range[0], value_range[1], size=dataset_shape).astype(np.float64)
+                            else:
+                                raise ValueError(f"unsupported datatype '{datatype}'")
 
-                        # Generate a NumPy array with the correct shape and datatype
-                        if datatype == "uint8_t":
-                            input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint8)
-                        elif datatype == "uint16_t":
-                            input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint16)
-                        elif datatype == "uint32_t":
-                            input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint32)
-                        elif datatype == "uint64_t":
-                            input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.uint64)
-                        elif datatype == "int8_t":
-                            input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int8)
-                        elif datatype == "int16_t":
-                            input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int16)
-                        elif datatype == "int32_t":
-                            input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int32)
-                        elif datatype == "int64_t":
-                            input_array = np.random.randint(value_range[0], value_range[1], size=dataset_shape, dtype=np.int64)
-                        elif datatype == "float":
-                            input_array = np.random.uniform(value_range[0], value_range[1], size=dataset_shape).astype(np.float32)
-                        elif datatype == "double":
-                            input_array = np.random.uniform(value_range[0], value_range[1], size=dataset_shape).astype(np.float64)
-                        else:
-                            raise ValueError(f"unsupported datatype '{datatype}'")
+                            input_arrays.append(input_array)
 
-                        input_arrays.append(input_array)
+                            total_size = np.prod(dataset_shape)
+                            h_file.write(f"extern const {datatype} {dataset_name}[{total_size}];\n")
 
-                        total_size = np.prod(dataset_shape)
-                        h_file.write(f"extern const {datatype} {dataset_name}[{total_size}];\n")
+                            # Define dataset in Source File (data.c)
+                            c_file.write(f"const {datatype} {dataset_name}[{total_size}]" + " = {\n")
+                            
+                            # Write the golden result array with formatting
+                            verifit_util._write_array(c_file, input_array, dataset_shape)
 
-                        # Define dataset in Source File (data.c)
-                        c_file.write(f"const {datatype} {dataset_name}[{total_size}]" + " = {\n")
-                        
-                        # Write the golden result array with formatting
-                        verifit_util._write_array(c_file, input_array, dataset_shape)
-
-                        c_file.write("};\n\n")
+                            c_file.write("};\n\n")
 
                     output_datasets = test.get("outputDataset", {})
 
