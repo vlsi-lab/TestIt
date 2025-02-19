@@ -275,6 +275,7 @@ class VerifItEnv:
                     if "parameters" in test:
                         if swipe_mode:
                             swipe_parameters = verifit_util._get_swipe_parameters(test_iteration, test['parameters'])
+                            print(swipe_parameters)
                        
                         parameter_index = 0
                         for param in test['parameters']:
@@ -291,6 +292,7 @@ class VerifItEnv:
                                 param["value"] = swipe_parameters[parameter_index]
                                 parameter_index += 1
 
+                            print(f"{param_name},{param_value},{iteration}")
                             param_value = param["value"]
                             h_file.write(f"#define {param_name} {param_value}\n")
 
