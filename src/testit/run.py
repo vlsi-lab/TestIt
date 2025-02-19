@@ -150,7 +150,7 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
             else:
                 test_iterations = swipe_test_iterations
 
-            rich.print("Swipe mode is active, TestIt will cycle through each possible combination of parameters for each test")
+            rich.print("[yellow]WARNING[/yellow]: Swipe mode is active, TestIt will cycle through each possible combination of parameters for each test")
             
         # Run the verification campaign
         if not italian_mode:

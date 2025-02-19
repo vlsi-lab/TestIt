@@ -286,7 +286,7 @@ class TestItEnv:
                                 
                                 # If the parameter's value is a list, take a random value from the range
                                 if isinstance(param["value"], list):
-                                    param_value = random.randint(param_value[0], param_value[1])
+                                    param_value = random.randint(param["value"][0], param["value"][1])
                                     param["value"] = param_value
                             else:
                                 param["value"] = swipe_parameters[parameter_index]
