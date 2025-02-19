@@ -296,19 +296,18 @@ class VerifItEnv:
 
                     h_file.write("\n")
 
+                    c_file.write('#include "data.h"\n\n')
+
                     input_datasets = test.get("inputDataset", [])
 
                     # Ensure input_datasets is a list (it might be a dict if only one exists)
                     if isinstance(input_datasets, dict):
                         input_datasets = [input_datasets]
-
-                    c_file.write('#include "data.h"\n\n')
-
-                    input_arrays = []
-                    
+                        
                     if input_datasets:
-                        print("AAAAAAA")
-                        print(input_datasets)
+                        
+                        input_arrays = []
+                        
                         for dataset in input_datasets:
                             dataset_name = dataset["name"]
                             datatype = dataset["dataType"]
@@ -361,7 +360,7 @@ class VerifItEnv:
 
                             c_file.write("};\n\n")
 
-                    output_datasets = test.get("outputDataset", {})
+                    output_datasets = test.get("outputDataset", [])
 
                     # Ensure output_datasets is a list (it might be a dict if only one exists)
                     if isinstance(output_datasets, dict):
