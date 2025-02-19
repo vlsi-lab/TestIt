@@ -209,6 +209,7 @@ class VerifItEnv:
         PRINT_DEB("Output lines:", outputLines)
 
         # Analyse the results of the test
+        output_matches = []
         pattern = re.compile(pattern)  
         for line in outputLines:
             match = pattern.search(line)
@@ -216,9 +217,9 @@ class VerifItEnv:
                 
                 matched_data = match.groups()
                 result_dict = {output_tags[i]: matched_data[i] for i in range(len(matched_data))}
-                break
-
-        verifit_util._append_results_to_report(self.cfg['report']['dir'], app_name, iteration, result_dict)
+                output_matches.append(result_dict)
+                
+        verifit_util._append_results_to_report(self.cfg['report']['dir'], app_name, iteration, output_matches)
         return True
 
     # Generate a report of the last verification campaign.

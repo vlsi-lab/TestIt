@@ -10,7 +10,7 @@ import rich
 
 # Set this to True to enable debugging prints
 # TODO: REMOVE BEFORE RELEASE
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 def _write_array(f, array, shape, indent=2):    
     flat_array = array.flatten()
@@ -67,8 +67,9 @@ def _append_results_to_report(dir, test_name, iteration, results):
         db[test_name] = []
 
     # Append new result
-    result_entry = {"iteration": iteration, **results}
-    db[test_name].append(result_entry)
+    for result in results:
+        result_entry = {"iteration": iteration, **result}
+        db[test_name].append(result_entry)
 
     PRINT_DEB(f"Database after appending: {db}")
 
