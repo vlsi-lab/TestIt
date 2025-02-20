@@ -7,8 +7,8 @@ def main():
 
     # Define subparsers for individual commands
     run_parser = subparsers.add_parser("run", help="Run the verification process")
-    subparsers.add_parser("setup", help="Sets up the verification environment")
-    report_parser = subparsers.add_parser("report", help="Generates a report based on the test results")
+    subparsers.add_parser("setup", help="Set up the verification environment")
+    report_parser = subparsers.add_parser("report", help="Generate a report based on the test results")
     
     # Add a flag to the 'run' command to indicate if the FPGA model has already been synthesized
     run_parser.add_argument(
@@ -20,7 +20,7 @@ def main():
     run_parser.add_argument(
         "--swipe",
         action="store_true",
-        help="Avoid building the model"
+        help="Test every possible combination of parameters"
     )
 
     run_parser.add_argument(

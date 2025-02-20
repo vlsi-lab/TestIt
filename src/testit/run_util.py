@@ -16,12 +16,12 @@ def _PRINT(*args, **kwargs):
     if DEBUG_MODE:
         print(*args, **kwargs)
 
-# Parses config.ver as an HJSON from the current working directory
+# Parses config.test as an HJSON from the current working directory
 def _load_config():
-    config_path = os.path.join(os.getcwd(), "config.ver")
+    config_path = os.path.join(os.getcwd(), "config.test")
     
     if not os.path.exists(config_path):
-        print("ERROR: config.ver not found in the current directory.")
+        print("ERROR: config.test not found in the current directory.")
         return None
 
     with open(config_path, "r") as file:

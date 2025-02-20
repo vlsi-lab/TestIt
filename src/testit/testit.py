@@ -253,7 +253,7 @@ class TestItEnv:
         with open(f"{self.cfg['report']['dir']}/report.rpt", "w") as f:
             f.write(console.export_text())
     
-    # This function generates datasets for every test insered in config.ver.
+    # This function generates datasets for every test insered in config.test.
     # Both input and output datasets are written in a single file, "data.c" and "data.h".
     def gen_datasets(self, swipe_mode=False, test_iteration=None):
         testCopy = copy.deepcopy(self.cfg.get("tests", []))
