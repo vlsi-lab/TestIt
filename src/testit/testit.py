@@ -76,7 +76,6 @@ class TestItEnv:
             if not self.serial_comm_instance.is_open:
                 return False
         except Exception as e:
-            print(f"Serial exception: {e}")
             return False
         
         self.serial_comm_queue = queue.Queue()
@@ -137,8 +136,10 @@ class TestItEnv:
             app_compile_cmd = f"make sw-fpga app={app_name} target={self.cfg['target']['name']}"
             result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
 
-            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout):
-                print(result_compilation.stdout)
+            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout) or ("error" in result_compilation.stdout) \
+              ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr) or ("error" in result_compilation.stderr):
+                with open("testit_crash.log", "w") as file:
+                    file.write(result_compilation.stdout)
                 return False
             else:
                 PRINT_DEB("Compilation successful!")
@@ -183,9 +184,12 @@ class TestItEnv:
             app_compile_cmd = f"make sw-sim app={app_name}"
             result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
 
-            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout):
-                print(result_compilation.stdout)
-                return False
+            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout) or ("error" in result_compilation.stdout) \
+              ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr) or ("error" in result_compilation.stderr):
+              with open("testit_crash.log", "w") as file:
+                    file.write(result_compilation.stdout)
+                    file.write(result_compilation.stderr)
+              return False
             
             PRINT_DEB("Compilation successful!")
 
@@ -193,8 +197,11 @@ class TestItEnv:
             sim_cmd = f"make sim-run app={app_name}"
             result_sim = subprocess.run(sim_cmd, shell=True, capture_output=True, text=True)
 
-            if ("ERROR" in result_sim.stdout) or ("Error" in result_sim.stdout):
-                print(result_sim.stdout)
+            if ("ERROR" in result_sim.stdout) or ("Error" in result_sim.stdout) or ("error" in result_sim.stdout) \
+              ("ERROR" in result_sim.stderr) or ("Error" in result_sim.stderr) or ("error" in result_sim.stderr):
+                with open("testit_crash.log", "w") as file:
+                    file.write(result_sim.stdout)
+                    file.write(result_sim.stderr)
                 return False
             
             PRINT_DEB("Simulation successful!")
