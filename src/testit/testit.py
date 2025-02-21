@@ -136,7 +136,7 @@ class TestItEnv:
             app_compile_cmd = f"make sw-fpga app={app_name} target={self.cfg['target']['name']}"
             result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
 
-            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout) or ("error" in result_compilation.stdout) \
+            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout) or ("error" in result_compilation.stdout) or \
               ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr) or ("error" in result_compilation.stderr):
                 with open("testit_crash.log", "w") as file:
                     file.write(result_compilation.stdout)
@@ -184,7 +184,7 @@ class TestItEnv:
             app_compile_cmd = f"make sw-sim app={app_name}"
             result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
 
-            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout) or ("error" in result_compilation.stdout) \
+            if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout) or ("error" in result_compilation.stdout) or \
               ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr) or ("error" in result_compilation.stderr):
               with open("testit_crash.log", "w") as file:
                     file.write(result_compilation.stdout)
@@ -197,7 +197,7 @@ class TestItEnv:
             sim_cmd = f"make sim-run app={app_name}"
             result_sim = subprocess.run(sim_cmd, shell=True, capture_output=True, text=True)
 
-            if ("ERROR" in result_sim.stdout) or ("Error" in result_sim.stdout) or ("error" in result_sim.stdout) \
+            if ("ERROR" in result_sim.stdout) or ("Error" in result_sim.stdout) or ("error" in result_sim.stdout) or \
               ("ERROR" in result_sim.stderr) or ("Error" in result_sim.stderr) or ("error" in result_sim.stderr):
                 with open("testit_crash.log", "w") as file:
                     file.write(result_sim.stdout)
