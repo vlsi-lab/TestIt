@@ -138,9 +138,10 @@ class TestItEnv:
 
             if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout) or ("error" in result_compilation.stdout) or \
               ("ERROR" in result_compilation.stderr) or ("Error" in result_compilation.stderr) or ("error" in result_compilation.stderr):
-                with open("testit_crash.log", "w") as file:
+              with open("testit_crash.log", "w") as file:
                     file.write(result_compilation.stdout)
-                return False
+                    file.write(result_compilation.stderr)
+              return False
             else:
                 PRINT_DEB("Compilation successful!")
             

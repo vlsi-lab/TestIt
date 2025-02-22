@@ -24,9 +24,9 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
         exit(1)    
 
     # Create the TestIt object
-    verEnv = testit.TestItEnv(data)
+    testEnv = testit.TestItEnv(data)
 
-    verEnv.clear_results()
+    testEnv.clear_results()
     
     if not italian_mode:
       rich.print("[cyan]Setting up TestIt project...[/cyan]")
@@ -52,10 +52,10 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
         # Build the model
         if not italian_mode:
             with Status(" - [cyan]Building model...[/cyan]", spinner="dots") as status:
-                build_success = verEnv.build_model()
+                build_success = testEnv.build_model()
         else:
             with Status(" - [cyan]Making pasta dough...[/cyan]", spinner="dots") as status:
-                build_success = verEnv.build_model()
+                build_success = testEnv.build_model()
 
         if not build_success:
             rich.print(" - [bold red]ERROR: Model build failed![/bold red]")
@@ -70,10 +70,10 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
     if data['target']['type'] == "fpga":
         if not italian_mode:
             with Status(f" - [cyan]Loading model on FPGA board {data['target']['name']}...[/cyan]", spinner="dots") as status:
-                load_success = verEnv.load_fpga_model()
+                load_success = testEnv.load_fpga_model()
         else:
             with Status(f" - [cyan]Frying the soffritto in a pan...[/cyan]", spinner="dots") as status:
-                load_success = verEnv.load_fpga_model() 
+                load_success = testEnv.load_fpga_model() 
 
         if not load_success:
             rich.print(f" - [bold red]ERROR: Model load on FPGA board {data['target']['name']} failed![/bold red]")
@@ -87,10 +87,10 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
 
         if not italian_mode:
             with Status(" - [cyan]Setting up serial connection...[/cyan]", spinner="dots") as status:
-                serial_setup_success = verEnv.serial_begin()
+                serial_setup_success = testEnv.serial_begin()
         else:
             with Status(" - [cyan]Opening a couple of pelati cans...[/cyan]", spinner="dots") as status:
-                serial_setup_success = verEnv.serial_begin()
+                serial_setup_success = testEnv.serial_begin()
         
         if not serial_setup_success:
             rich.print(" - [bold red]ERROR: Serial setup failed![/bold red]")
@@ -102,14 +102,14 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
             else:
                 rich.print(" - Pelati cans [bold green][OPENED][/bold green]")
         
-        verEnv.setup_deb()
+        testEnv.setup_deb()
 
         if not italian_mode:
             with Status(" - [cyan]Setting up GDB...[/cyan]", spinner="dots") as status:
-                gdb_setup_success = verEnv.setup_gdb()
+                gdb_setup_success = testEnv.setup_gdb()
         else:
             with Status(" - [cyan]Cooking the pomodoro sauce...[/cyan]", spinner="dots") as status:
-                gdb_setup_success = verEnv.setup_gdb()
+                gdb_setup_success = testEnv.setup_gdb()
 
         if not gdb_setup_success:
             rich.print(" - [bold red]ERROR: GDB setup failed![/bold red]")
@@ -167,14 +167,24 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
         start = False
 
         for test_iteration in range(test_iterations):
-            if not verEnv.gen_datasets(swipe_mode, test_iteration):
+            if not testEnv.gen_datasets(swipe_mode, test_iteration):
               rich.print(f" - [bold red]ERROR: Dataset generation failed![/bold red]")
               exit(1)
 
             update_list_of_tests = False
+            test_counter = 0
 
             for test in data['tests']:
-                if not verEnv.launch_test(app_name=test['appName'], iteration=test_iteration, pattern=rf"{test['outputFormat']}", output_tags=test['outputTags'], timeout_t=1000):
+                
+                if test_counter == 20 and data['target']['type'] == "fpga":
+                    testEnv.stop_deb()
+                    gdb_setup_success = testEnv.setup_gdb()
+                    if not gdb_setup_success:
+                        rich.print(f" - [bold red]ERROR: Failed to re-setup GDB[/bold red]")
+                        exit(1)
+                    
+
+                if not testEnv.launch_test(app_name=test['appName'], iteration=test_iteration, pattern=rf"{test['outputFormat']}", output_tags=test['outputTags'], timeout_t=1000):
                     rich.print(f" - [bold red]ERROR: Test {test['appName']} failed because of GDB timeout[/bold red]")
                     exit(1)
                 if not start:
@@ -195,7 +205,7 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
                 data['tests'] = new_data
 
         if data['target']['type'] == "fpga":
-            verEnv.stop_deb()
+            testEnv.stop_deb()
 
         if not italian_mode:
             rich.print(" - All tests [bold green][RAN][/bold green]")
@@ -225,6 +235,6 @@ def testit_report(sort_key, ascending):
     data = run_util._load_config()
 
     # Create the TestIt object
-    verEnv = testit.TestItEnv(data)
+    testEnv = testit.TestItEnv(data)
 
-    verEnv.gen_report(sort_key, ascending)
+    testEnv.gen_report(sort_key, ascending)
