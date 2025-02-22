@@ -165,6 +165,8 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
 
         task = progress.add_task(task_message, total=test_iterations, start=False)
         start = False
+        
+        test_counter = 0
 
         for test_iteration in range(test_iterations):
             if not testEnv.gen_datasets(swipe_mode, test_iteration):
@@ -172,16 +174,18 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
               exit(1)
 
             update_list_of_tests = False
-            test_counter = 0
 
             for test in data['tests']:
                 
                 if test_counter == 20 and data['target']['type'] == "fpga":
+                    test_counter = 0
                     testEnv.stop_deb()
                     gdb_setup_success = testEnv.setup_gdb()
                     if not gdb_setup_success:
                         rich.print(f" - [bold red]ERROR: Failed to re-setup GDB[/bold red]")
                         exit(1)
+                else:
+                    test_counter += 1
                     
 
                 if not testEnv.launch_test(app_name=test['appName'], iteration=test_iteration, pattern=rf"{test['outputFormat']}", output_tags=test['outputTags'], timeout_t=1000):
