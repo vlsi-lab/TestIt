@@ -1,3 +1,34 @@
 [build-system]
-requires = ['setuptools>=42']
-build-backend = 'setuptools.build_meta'
+requires = ["setuptools>=45", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "testitpy"
+version = "0.0.1"
+authors = [
+    {name = "Tommaso Terzano", email = "tommaso.terzano@gmail.com"},
+]
+description = "A tool for verifying FPGA models using custom SW applications"
+readme = "README.md"
+requires-python = ">=3.7"
+dependencies = [
+    "rich",
+    "pexpect",
+    "numpy",
+    "pyserial",
+    "hjson",
+    "importlib_resources",
+]
+
+[project.scripts]
+testit = "testit.main:main"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+testit = ["templates/*"]
