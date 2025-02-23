@@ -50,7 +50,10 @@ jobs:
         path: dist/
     - name: Publish distribution 📦 to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
-  
+      with:
+        oidc: false
+        password: ${{ secrets.PYPI_TOKEN }} # gets ignored if oidc is true
+
   github-release:
     name: >-
       Sign the Python 🐍 distribution 📦 with Sigstore
