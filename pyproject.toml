@@ -19,6 +19,7 @@ dependencies = [
     "hjson",
     "importlib_resources",
 ]
+license-files = ["LICENSE"]
 
 [project.scripts]
 testit = "testit.main:main"
