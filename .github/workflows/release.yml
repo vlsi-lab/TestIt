@@ -51,8 +51,12 @@ jobs:
       with:
         name: python-package-distributions
         path: dist/
-    - name: Publish distribution 📦 to PyPI
-      uses: pypa/gh-action-pypi-publish@release/v1
+    - name: Publish to PyPI
+        env:
+          TWINE_USERNAME: __token__  # Use the token authentication
+          TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          twine upload dist/*
 
   github-release:
     name: >-
