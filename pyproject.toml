@@ -8,7 +8,7 @@ version = "0.1"
 authors = [
     {name = "Tommaso Terzano", email = "tommaso.terzano@gmail.com"},
 ]
-description = "A tool for verifying FPGA models using custom SW applications"
+description = "A tool for verifying RTL and FPGA models using custom SW applications"
 readme = "README.md"
 requires-python = ">=3.7"
 dependencies = [
