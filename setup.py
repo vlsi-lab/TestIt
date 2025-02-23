@@ -4,7 +4,7 @@ with open("README.md", "r", encoding = "utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="testitpy",
+    name="testit",
     version="0.0.1",
     author="Tommaso Terzano",
     author_email="tommaso.terzano@gmail.com",
