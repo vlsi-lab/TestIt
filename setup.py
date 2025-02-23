@@ -4,8 +4,8 @@ with open("README.md", "r", encoding = "utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="testit",
-    version="0.1",
+    name="pytestit",
+    version="0.0.1",
     author="Tommaso Terzano",
     author_email="tommaso.terzano@gmail.com",
     description="A tool for verifying FPGA models using custom SW applications",
