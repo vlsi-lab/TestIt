@@ -56,7 +56,7 @@ jobs:
         TWINE_USERNAME: __token__
         TWINE_PASSWORD: ${{ secrets.PYPI_TOKEN }}
       run: |
-        python3 -m pip install --upgrade twine  
+        python3 -m pip install --upgrade twine pkginfo
         twine upload dist/*
 
   github-release:
