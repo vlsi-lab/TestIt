@@ -111,9 +111,6 @@ def _serial_rx_setup(ser: serial.Serial, serial_comm_queue, endword="&"):
                     received = True
                     PRINT_DEB(f"Received {endword}: end of serial transmission thread")
                     return
-                elif "ERROR" in line:
-                    print("FAILED VERIFICATION!")
-                    exit(1)
     except serial.SerialException as e:
         print(f"Serial exception: {e}")
     except Exception as e:
@@ -168,8 +165,8 @@ def __run_command(command):
 
     process.wait()  # Ensure process is fully done before exiting
 
-def _get_swipe_parameters(iteration, parameters):
-    swipe_parameters = []
+def _get_sweep_parameters(iteration, parameters):
+    sweep_parameters = []
     range_sizes = []
     param_ranges = []
     complete_parameters = []
@@ -190,13 +187,13 @@ def _get_swipe_parameters(iteration, parameters):
         if idx > 0:
             step_product *= range_sizes[idx - 1]
         param_value = min_val + ((iteration // step_product) % range_sizes[idx]) * step
-        swipe_parameters.append(param_value)
+        sweep_parameters.append(param_value)
     
-    swipe_index = 0
+    sweep_index = 0
     for param in parameters:
         if isinstance(param['value'], list):
-            complete_parameters.append(swipe_parameters[swipe_index])
-            swipe_index += 1
+            complete_parameters.append(sweep_parameters[sweep_index])
+            sweep_index += 1
         else:
             complete_parameters.append(param['value'])
 

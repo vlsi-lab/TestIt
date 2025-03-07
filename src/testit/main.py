@@ -18,7 +18,7 @@ def main():
     )
     
     run_parser.add_argument(
-        "--swipe",
+        "--sweep",
         action="store_true",
         help="Test every possible combination of parameters"
     )
@@ -46,7 +46,7 @@ def main():
     args = parser.parse_args()
 
     if args.command == "run":
-        run.testit_run(args.nobuild, args.mammamia, args.swipe)
+        run.testit_run(args.nobuild, args.mammamia, args.sweep)
     elif args.command == "setup":
         run.testit_setup()
     elif args.command == "report":

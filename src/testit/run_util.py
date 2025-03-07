@@ -63,7 +63,7 @@ def _update_time_estimation(progress, task_id):
         progress.refresh()
         time.sleep(0.2)  # Adjust this to control the update frequency
         
-def _configuration_check(configuration, swipe_mode):
+def _configuration_check(configuration, sweep_mode):
     if configuration['target']['type'] not in ["sim", "fpga"]:
         rich.print("   [bold red]ERROR: Invalid target type![/bold red]")
         rich.print(f"   {configuration['target']['type']} is neither 'sim' nor 'fpga'")
@@ -73,27 +73,27 @@ def _configuration_check(configuration, swipe_mode):
         rich.print("   [bold red]ERROR: invalid usbPort and/or baudrate![/bold red]")
         return False
 
-    if swipe_mode:
+    if sweep_mode:
         for test in configuration['tests']:
             if not any(isinstance(param["value"], list) for param in test["parameters"]):
-                rich.print("   [bold red]ERROR: swipe mode requires every test to have at least one dynamic parameter![/bold red]")
+                rich.print("   [bold red]ERROR: sweep mode requires every test to have at least one dynamic parameter![/bold red]")
                 return False
             for param in test["parameters"]:
               if isinstance(param['value'], list):
                   if 'step' not in param or not isinstance(param['step'], int):
-                      rich.print("   [bold red]ERROR: with swipe mode, each parameter requires a 'step' parameter to be defined as an integer![/bold red]")
+                      rich.print("   [bold red]ERROR: with sweep mode, each parameter requires a 'step' parameter to be defined as an integer![/bold red]")
                       return False
     
     return True
 
 # Returns all the possible combinations of tests 
-def _get_tot_swipe_iterations(data):
-    swipe_parameters = []
+def _get_tot_sweep_iterations(data):
+    sweep_parameters = []
     for test in data['tests']:
         tot = 1
         for parameter in test['parameters']:
             if isinstance(parameter['value'], list):
                 tot *= int(abs(parameter['value'][0] - parameter['value'][1])/parameter['step']) + 1
-        swipe_parameters.append(tot)
+        sweep_parameters.append(tot)
     
-    return swipe_parameters
+    return sweep_parameters

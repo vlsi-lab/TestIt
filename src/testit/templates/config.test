@@ -1,148 +1,58 @@
 {
-  target:
-  {
-    name: "fpga_board_name" # or "simulation_tool_name", must be one of the targets defined in "testit.mk"
-    type: "fpga" # or "sim", MANDATORY
-    outputFormat: "(\\d+):(\\d+):(\\d+)" # Regular expression that defines the format of the output of the target
-                                         # e.g. (testId:executionTime:testOutcome)
-                                         # IMPORTANT: This format has to be consistent with the serial output 
-                                         #            software application.
-    outputTags: ["ID", "Cycles", "Outcome"]
-    usbPort: None # For FPGA targets
-    baudrate: 9600 # For FPGA targets
-    iterations: 100 # Set the number of iterations of the verification campaign
-    outputFile: "path/to/output/dir/file.log" # Directory to the UART log of the simulation
+  target: {
+    name: "pynq-z2"
+    type: "fpga"
+    usbPort: 2 
+    baudrate: 9600
+    iterations: 10
+    outputFile: "path/to/sim/dump"
   }
 
   report: {
-    dir: "path/to/report/dir" # Insert the directory for the dumped report
-    includeExecutionTimeStats: true
-    includeResults: true
-    includeStatisticalAnalysis: true
-    includeFailedTestsDescription: true
-    includePerformanceAnalysis: true
+    dir: "path/to/report/folder"
   }
   
   test: [
     {
-      name: "test1"
-      dir: "/path/to/dir1"
-      # The number of input and output datasets must be coherent with the function used to compute the golden result
-      numberInputDatasets: 1
-      numberOutputDatasets: 1
+      appName: "application_name"
+      dir: "path/to/app"
+      genFilesName: "test_data"
+      outputFormat: "(\\d+):(\\d+):(\\d+)" 
+      outputTags: ["TestID", "Cycles", "Outcome"]
 
-      # Parameters are quite important. They can describe crucial information for the target algorithm,
-      # and for the golden function too. For example, they could indicate the number of channels in a convolution
-      # or the datatype of the output.
       parameters: [
         {
-          name: "paramSel" # The name of the parameter must be coherent with what the golden result function expects
-          value: "0"
+          name: "SIZE"
+          value: [4, 10]
+          step: 2
         }
       ]
 
-      # Both input and output datasets are written in a single file, "data.c" for data and "data.h" for parameters
-      inputDataset: {
-        name: "input1"
-        dataType: "int"
-        valueRange: [-50, 50]
-        dimensions: [15] # Example of a fixed-size 1D array        
-      }
+      inputDataset: [
+        { 
+          name: "input_matrix_A"
+          dataType: "uint8_t"
+          valueRange: [0, 255]
+          dimensions: ["SIZE". "SIZE"]
+        }
+        { 
+          name: "input_matrix_B"
+          dataType: "uint8_t"
+          valueRange: [0, 255]
+          dimensions: ["SIZE". "SIZE"]
+        }
+      ]
 
-      outputDataset: {
-        name: "output1"
-        dataType
-        # The size of the output dataset is automatically computed by the golden result function
-      }
+      outputDataset: [
+        { 
+          name: "output_matrix"
+          dataType: "uint8_t"
+        }
+      ]
 
       goldenResultFunction: {
-        name: "exampleFunction" # It must be included in the testit_golden.py that must be present in the root of the target folder
-        dataType: "int"
+        name: "matmul"
       }
-    }
-    {
-      name: "test2"
-      dir: "/path/to/dir2"
-      # The number of input and output datasets must be coherent with the function used to compute the golden result
-      numberInputDatasets: 3
-      numberOutputDatasets: 1
-
-      parameters: [
-        {
-          name: "paramSel" # The name of the parameter must be coherent with what the golden result function expects
-          value: "0"
-        }
-      ]
-
-      inputDataset: [
-        { 
-          name: "weights"
-          dataType: "uint8_t"
-          valueRange: [0, 50]
-          dimensions: [15, 15] # Example of a fixed-size 2D array
-        }
-        {
-          name: "biases"
-          dataType: "uint16_t"
-          valueRange: [0, 20]
-          dimensions: [15] # Example of a 1D array
-        }
-        {
-          name: "activations"
-          dataType: "uint32_t"
-          valueRange: [0, 100]
-          dimensions: [15, 15] # Example of a fixed-size 2D array
-        }
-      ]
-
-      outputDataset: {
-        name: "convResult"
-        dataType: "int"
-      }
-
-      goldenResultFunction: [
-        {
-          name: "convolution" # One of the .py from the "lib" folder
-        }
-      ]
-    }
-    {
-      name: "test3"
-      dir: "/path/to/dir3"
-      
-      numberInputDatasets: 1
-      numberOutputDatasets: 1
-
-      parameters: [
-        {
-          name: "inputLength"
-          value: [1, 15] # Parameters' value can also be a range of values
-        }
-        {
-          name: "inputWidth"
-          value: [1, 5]
-        }
-      ]
-
-      inputDataset: [
-        { 
-          name: "inputs"
-          dataType: "int"
-          valueRange: [0, 50]
-          dimensions: ["inputLength", "inputWidth"] # Example of a dynamic-size 2D array, which depends on parameters
-        }
-      ]
-
-      outputDataset: {
-        name: "result"
-        dataType: "int"
-      }
-
-      goldenResultFunction: [
-        {
-          name: "exampleFunction" # One of the .py from the "lib" folder
-        }
-      ]
     }
   ]
 }

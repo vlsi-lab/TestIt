@@ -83,7 +83,17 @@ class TestItEnv:
         return True
             
     def setup_deb(self):
-        testit_util._run_command_threading(f"make deb-setup")
+        deb_cmd = f"""
+        cd {os.getcwd()}
+        make deb-setup
+        """
+        self.deb = pexpect.spawn(f"/bin/bash -c '{deb_cmd}'")
+        if self.deb.isalive():
+            return True
+        else:
+            print({self.deb.exitstatus})
+            return False
+            
 
     # Set-up GDB
     def setup_gdb(self):
@@ -112,9 +122,13 @@ class TestItEnv:
             exit(1)
             
     # Stop GDB
-    def stop_deb(self):
+    def stop_gdb(self):
         self.gdb.sendcontrol('c')
         self.gdb.terminate()
+    
+    def stop_deb(self):
+        self.deb.sendcontrol('c')
+        self.deb.terminate()
 
     # Launch a test by compiling the target application and loading it into the FPGA flash via GDB
     def launch_test(self, app_name, iteration, pattern=r'(\d+):(\d+):(\d+)', output_tags=None, timeout_t=0):
@@ -263,7 +277,7 @@ class TestItEnv:
     
     # This function generates datasets for every test insered in config.test.
     # Both input and output datasets are written in a single file, "data.c" and "data.h".
-    def gen_datasets(self, swipe_mode=False, test_iteration=None):
+    def gen_datasets(self, sweep_mode=False, test_iteration=None):
         testCopy = copy.deepcopy(self.cfg.get("tests", []))
         for test in testCopy:
             
@@ -282,22 +296,22 @@ class TestItEnv:
 
                     # Iterate through parameters list
                     if "parameters" in test:
-                        if swipe_mode:
-                            swipe_parameters = testit_util._get_swipe_parameters(test_iteration, test['parameters'])
+                        if sweep_mode:
+                            sweep_parameters = testit_util._get_sweep_parameters(test_iteration, test['parameters'])
                        
                         parameter_index = 0
                         for param in test['parameters']:
                             
                             param_name = param["name"]
 
-                            if not swipe_mode:
+                            if not sweep_mode:
                                 
                                 # If the parameter's value is a list, take a random value from the range
                                 if isinstance(param["value"], list):
                                     param_value = random.randint(param["value"][0], param["value"][1])
                                     param["value"] = param_value
                             else:
-                                param["value"] = swipe_parameters[parameter_index]
+                                param["value"] = sweep_parameters[parameter_index]
                                 parameter_index += 1
 
                             param_value = param["value"]

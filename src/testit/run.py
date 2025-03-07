@@ -6,26 +6,33 @@ from . import testit
 import os
 import threading
 import queue
+import time
 
-def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
+import os
+import time
+import json
+from rich import print
+from rich.progress import Progress, TextColumn, BarColumn, TimeRemainingColumn, SpinnerColumn
+from rich.status import Status
+
+def testit_run(no_build=False, italian_mode=False, sweep_mode=False):
     
     current_directory = os.getcwd()
 
     # Load the configuration file
     data = run_util._load_config()
     if data is None:
-        rich.print("[bold red]ERROR: config.test not found![/bold red")
+        rich.print("[bold red]ERROR: config.test not found![/bold red]")
         rich.print("Please run the 'setup' command first.")
         exit(1)
     
     if not os.path.exists(f"{current_directory}/testit_golden.py"):
-        rich.print("[bold red]ERROR: testit_golden.py not found![/bold red")
+        rich.print("[bold red]ERROR: testit_golden.py not found![/bold red]")
         rich.print("Please run the 'setup' command first.")
         exit(1)    
 
     # Create the TestIt object
     testEnv = testit.TestItEnv(data)
-
     testEnv.clear_results()
     
     if not italian_mode:
@@ -39,7 +46,7 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
         rich.print(" - [bold red]ERROR: Target project Makefile check failed![/bold red]")
         rich.print("   Please ensure that the Makefile contains the required targets")
         exit(1)
-    elif not run_util._configuration_check(data, swipe_mode):
+    elif not run_util._configuration_check(data, sweep_mode):
         rich.print(" - [bold red]ERROR: there is an issue with config.test critical parameters![/bold red]")
         exit(1)
     else:
@@ -102,7 +109,15 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
             else:
                 rich.print(" - Pelati cans [bold green][OPENED][/bold green]")
         
-        testEnv.setup_deb()
+        deb_setup_success = testEnv.setup_deb()
+        if not deb_setup_success:
+            rich.print(f" - [bold red]ERROR: Debugger setup failed![/bold red]")
+            exit(1)
+        else:
+            if not italian_mode:
+                rich.print(" - Debugger setup [bold green][OK][/bold green]")
+            else:
+                rich.print(" - Basil leaves [bold green][PICKED][/bold green]") 
 
         if not italian_mode:
             with Status(" - [cyan]Setting up GDB...[/cyan]", spinner="dots") as status:
@@ -139,51 +154,68 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
     ) as progress:
         
         # Compute the total test iterations
-        if not swipe_mode:
+        if not sweep_mode:
             test_iterations = data['target']['iterations']
         else:
-            swipe_test_iterations = run_util._get_tot_swipe_iterations(data)
+            sweep_test_iterations = run_util._get_tot_sweep_iterations(data)
 
             test_index = 0
             for test in data['tests']:
-                test['totIterations'] = swipe_test_iterations[test_index]
+                test['totIterations'] = sweep_test_iterations[test_index]
                 test['currentIteration'] = 0
                 test_index += 1
 
-            if isinstance(swipe_test_iterations, list):
-                test_iterations = max(swipe_test_iterations)
+            if isinstance(sweep_test_iterations, list):
+                test_iterations = max(sweep_test_iterations)
             else:
-                test_iterations = swipe_test_iterations
+                test_iterations = sweep_test_iterations
 
-            rich.print("[yellow]WARNING[/yellow]: Swipe mode is active, TestIt will cycle through each possible combination of parameters for each test")
+            rich.print("[yellow]WARNING[/yellow]: sweep mode is active, TestIt will cycle through each possible combination of parameters for each test")
             
-        # Run the verification campaign
         if not italian_mode:
-          task_message = " - Running tests..."
+            task_message = " - Running tests..."
         else:
-          task_message = " - Cooking..."
+            task_message = " - Cooking..."
 
         task = progress.add_task(task_message, total=test_iterations, start=False)
         start = False
         
         test_counter = 0
 
+        test_duration_report = {}
+
         for test_iteration in range(test_iterations):
-            if not testEnv.gen_datasets(swipe_mode, test_iteration):
-              rich.print(f" - [bold red]ERROR: Dataset generation failed![/bold red]")
-              exit(1)
+            if not testEnv.gen_datasets(sweep_mode, test_iteration):
+                rich.print(f" - [bold red]ERROR: Dataset generation failed![/bold red]")
+                exit(1)
 
             update_list_of_tests = False
 
+            # Prepare a list for the current iteration's test durations
+            test_duration_report[test_iteration] = []
+
             for test in data['tests']:
-                
-                if test_counter == 20 and data['target']['type'] == "fpga":
+                start_time = time.time()
+
+                # Re-setup debugger every 10 tests if using FPGA
+                if test_counter == 10 and data['target']['type'] == "fpga":
                     test_counter = 0
+                    testEnv.stop_gdb()
                     testEnv.stop_deb()
+
+                    deb_setup_success = testEnv.setup_deb()
+                    if not deb_setup_success:
+                        deb_setup_again_success = testEnv.setup_deb()
+                        if not deb_setup_again_success:
+                            rich.print(f" - [bold red]ERROR: Failed to re-setup debugger[/bold red]")
+                            exit(1)
+
                     gdb_setup_success = testEnv.setup_gdb()
                     if not gdb_setup_success:
-                        rich.print(f" - [bold red]ERROR: Failed to re-setup GDB[/bold red]")
-                        exit(1)
+                        gdb_setup_again_success = testEnv.setup_gdb()
+                        if not gdb_setup_again_success:
+                            rich.print(f" - [bold red]ERROR: Failed to re-setup GDB[/bold red]")
+                            exit(1)
                 else:
                     test_counter += 1
                     
@@ -191,25 +223,42 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
                 if not testEnv.launch_test(app_name=test['appName'], iteration=test_iteration, pattern=rf"{test['outputFormat']}", output_tags=test['outputTags'], timeout_t=1000):
                     rich.print(f" - [bold red]ERROR: Test {test['appName']} failed because of GDB timeout[/bold red]")
                     exit(1)
+
                 if not start:
                     progress.start_task(task)
-                    # threading.Thread(target=run_util._update_time_estimation, args=(progress,task,), daemon=True).start()
                     start = True
                 
-                progress.update(task, advance=1, description=f" - [cyan]{test_iteration + 1}/{test_iterations}: {test['appName']}", refresh=True)
+                progress.update(task, advance=1, 
+                                description=f" - [cyan]{test_iteration + 1}/{test_iterations}: {test['appName']}", 
+                                refresh=True)
             
-                if swipe_mode:
+                if sweep_mode:
                     test['currentIteration'] += 1
                     if test['currentIteration'] == test['totIterations']:
                         test_to_be_removed_name = test['appName']
                         new_data = [p for p in data['tests'] if p['appName'] != test_to_be_removed_name]
                         update_list_of_tests = True
-            
+
+                end_time = time.time()
+                duration = end_time - start_time
+
+                test_duration_report[test_iteration].append({
+                    "name": test['appName'],
+                    "duration": duration
+                })
+
             if update_list_of_tests:
                 data['tests'] = new_data
 
         if data['target']['type'] == "fpga":
             testEnv.stop_deb()
+
+        # Output the time duration of the tests
+        report_dir = data['report']['dir']
+        os.makedirs(report_dir, exist_ok=True)
+        json_path = os.path.join(report_dir, "test_durations.json")
+        with open(json_path, "w") as f:
+            json.dump(test_duration_report, f, indent=2)
 
         if not italian_mode:
             rich.print(" - All tests [bold green][RAN][/bold green]")
@@ -217,6 +266,7 @@ def testit_run(no_build=False, italian_mode=False, swipe_mode=False):
         else:
             rich.print(" - Pasta [bold green][COOKED][/bold green]!")
             rich.print("\n[bold green]A tavola![/bold green]")
+
 
 # If necessary, generates the necessary files for the TestIt package: testit_golden.py and config.test
 def testit_setup():
