@@ -13,11 +13,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program. If not, see <https://www.gnu.org/licenses/>.
 
-# This is a template for the golden function(s) that can be used to define the expected behaviour 
+# This is a template for the golden function(s) that can be used to define the expected behaviour
 # of TestIt tests. The golden function(s) should use the NumPy library, as TestIt produces NumPy tensors
-# as input data and expects NumPy tensors as output data. 
+# as input data and expects NumPy tensors as output data.
 
 import numpy as np
+
 
 def matrix_multiply(A: np.ndarray, B: np.ndarray) -> np.ndarray:
     """
