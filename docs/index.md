@@ -24,7 +24,7 @@ With just three requirements:
 Again, it's super simple! Just follow this documentation and you'll find plenty of useful tips to integrate TestIt into your project.
 If you have any questions or suggestions, don’t hesitate to reach out to Tommaso Terzano at tommaso.terzano@gmail.com. He's always happy to help clear up any doubts you might have.
 
-> :warning: Take every "**must do**" with the utmost seriousness, as not following those advices will break TestIt. In Italy we say "_Uomo avvisato mezzo salvato_"...
+> ⚠️ Take every "**must do**" with the utmost seriousness, as not following those advices will break TestIt. In Italy we say "_Uomo avvisato mezzo salvato_"...
 
 ## Installation
 
@@ -360,7 +360,7 @@ testit report [flags]
 ```  
 This command generates a report of your most recent test campaign, displaying it in your terminal and saving it as `report.rpt` in the [directory](#report-dir) specified in `config.test`.  
 
-> :warning: Every time you run `testit run`, the previous test campaign data is erased! If you need to keep it, make sure to back it up somewhere else.  
+> ⚠️ Every time you run `testit run`, the previous test campaign data is erased! If you need to keep it, make sure to back it up somewhere else.  
 
 There are a couple of options to customize your report:  
 
