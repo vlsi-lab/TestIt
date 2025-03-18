@@ -196,7 +196,7 @@ class TestItEnv:
         # Test using the simulation tool
         else:
             # Compile the application
-            app_compile_cmd = f"make sw-sim app={app_name}"
+            app_compile_cmd = f"make sw-sim={self.cfg['target']['name']} app={app_name}"
             result_compilation = subprocess.run(app_compile_cmd, shell=True, capture_output=True, text=True)
 
             if ("ERROR" in result_compilation.stdout) or ("Error" in result_compilation.stdout) or ("error" in result_compilation.stdout) or \
@@ -298,7 +298,7 @@ class TestItEnv:
                     if "parameters" in test:
                         if sweep_mode:
                             sweep_parameters = testit_util._get_sweep_parameters(test_iteration, test['parameters'])
-                       
+                        
                         parameter_index = 0
                         for param in test['parameters']:
                             

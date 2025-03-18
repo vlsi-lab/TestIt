@@ -33,13 +33,13 @@
           name: "input_matrix_A"
           dataType: "uint8_t"
           valueRange: [0, 255]
-          dimensions: ["SIZE". "SIZE"]
+          dimensions: ["SIZE", "SIZE"]
         }
         { 
           name: "input_matrix_B"
           dataType: "uint8_t"
           valueRange: [0, 255]
-          dimensions: ["SIZE". "SIZE"]
+          dimensions: ["SIZE", "SIZE"]
         }
       ]
 

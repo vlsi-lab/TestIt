@@ -72,7 +72,12 @@ def testit_run(no_build=False, italian_mode=False, sweep_mode=False):
                 rich.print(" - Model build [bold green][OK][/bold green]")
             else:
                 rich.print(" - Hand-made pasta [bold green][DONE][/bold green]")
-
+    else:
+        if not italian_mode:
+            rich.print(" - Model build phase [bold green][SKIPPED][/bold green]")
+        else:
+            rich.print(" - Using [bold green][DRIED][/bold green] pasta")
+        
     # If the target is an FPGA board, load the model, then setup the serial connection and GDB
     if data['target']['type'] == "fpga":
         if not italian_mode:
@@ -135,9 +140,7 @@ def testit_run(no_build=False, italian_mode=False, sweep_mode=False):
             else:
                 rich.print(" - Pomodoro sauce [bold green][COOKED][/bold green]") 
     else:
-        if not italian_mode:
-            rich.print(" - Model build phase [bold green][SKIPPED][/bold green]")
-        else:
+        if italian_mode:
             rich.print(" - Using [bold green][STORE-BOUGHT][/bold green] tomato sauce")
 
     if not italian_mode:

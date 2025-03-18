@@ -4,7 +4,7 @@
 
 import numpy as np
 
-def matrix_multiply(A: np.ndarray, B: np.ndarray) -> np.ndarray:
+def matrix_multiply(inputs: list, parameters: list) -> list:
     """
     Multiplies two NumPy matrices and returns the result.
 
@@ -12,7 +12,13 @@ def matrix_multiply(A: np.ndarray, B: np.ndarray) -> np.ndarray:
     :param B: Second matrix (NumPy array)
     :return: Resulting matrix (NumPy array)
     """
-    if A.shape[1] != B.shape[0]:  # Check if multiplication is valid
+    matrix_A = inputs[0]
+    matrix_B = inputs[1]
+
+    # Check if multiplication is valid
+    if matrix_A.shape[1] != matrix_B.shape[0]:  
         raise ValueError("Matrix dimensions do not match for multiplication!")
 
-    return np.matmul(A, B)  # Perform matrix multiplication
+    result = np.matmul(matrix_A, matrix_A)
+
+    return [result]
