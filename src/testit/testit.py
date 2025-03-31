@@ -421,209 +421,210 @@ class TestItEnv:
             if not os.path.exists(test_dir):
                 print(f"ERROR: Test directory '{test_dir}' not found.")
                 return False
+            
+
+            input_datasets = test.get("inputDataset", [])
+            output_datasets = test.get("outputDataset", [])
+
+            # Ensure input_datasets is a list (it might be a dict if only one exists)
+            if isinstance(input_datasets, dict):
+                input_datasets = [input_datasets]
+
+            # Ensure output_datasets is a list (it might be a dict if only one exists)
+            if isinstance(output_datasets, dict):
+                output_datasets = [output_datasets]
 
             # Open files for writing
             try:
-                with open(
-                    f"{test_dir}/{test['genFilesName']}.h", "w", encoding="utf-8"
-                ) as h_file, open(
-                    f"{test_dir}/{test['genFilesName']}.c", "w", encoding="utf-8"
-                ) as c_file:
+                if input_datasets or output_datasets: 
+                  with open(
+                      f"{test_dir}/{test['genFilesName']}.h", "w", encoding="utf-8"
+                  ) as h_file, open(
+                      f"{test_dir}/{test['genFilesName']}.c", "w", encoding="utf-8"
+                  ) as c_file:
 
-                    h_file.write("#ifndef TEST_DATA_H\n")
-                    h_file.write("#define TEST_DATA_H\n\n")
-                    h_file.write("#include <stdint.h>\n\n")
+                      h_file.write("#ifndef TEST_DATA_H\n")
+                      h_file.write("#define TEST_DATA_H\n\n")
+                      h_file.write("#include <stdint.h>\n\n")
 
-                    # Iterate through parameters list
-                    if "parameters" in test:
-                        if sweep_mode:
-                            sweep_parameters = testit_util._get_sweep_parameters(test_iteration, test['parameters'])
-                        
-                        parameter_index = 0
-                        for param in test["parameters"]:
+                      # Iterate through parameters list
+                      if "parameters" in test:
+                          if sweep_mode:
+                              sweep_parameters = testit_util._get_sweep_parameters(test_iteration, test['parameters'])
+                          
+                          parameter_index = 0
+                          for param in test["parameters"]:
 
-                            param_name = param["name"]
+                              param_name = param["name"]
 
-                            if not sweep_mode:
-                                # If the parameter's value is a list, take a random value from the range
-                                if isinstance(param["value"], list):
-                                    param_value = random.randint(
-                                        param["value"][0], param["value"][1]
-                                    )
-                                    param["value"] = param_value
-                            else:
-                                param["value"] = sweep_parameters[parameter_index]
-                                parameter_index += 1
+                              if not sweep_mode:
+                                  # If the parameter's value is a list, take a random value from the range
+                                  if isinstance(param["value"], list):
+                                      param_value = random.randint(
+                                          param["value"][0], param["value"][1]
+                                      )
+                                      param["value"] = param_value
+                              else:
+                                  param["value"] = sweep_parameters[parameter_index]
+                                  parameter_index += 1
 
-                            param_value = param["value"]
-                            h_file.write(f"#define {param_name} {param_value}\n")
+                              param_value = param["value"]
+                              h_file.write(f"#define {param_name} {param_value}\n")
 
-                    h_file.write("\n")
+                      h_file.write("\n")
 
-                    file_name = test["genFilesName"]
-                    c_file.write(f'#include "{file_name}.h"\n\n')
+                      file_name = test["genFilesName"]
+                      c_file.write(f'#include "{file_name}.h"\n\n')
 
-                    input_datasets = test.get("inputDataset", [])
+                      if input_datasets:
 
-                    # Ensure input_datasets is a list (it might be a dict if only one exists)
-                    if isinstance(input_datasets, dict):
-                        input_datasets = [input_datasets]
+                          input_arrays = []
 
-                    if input_datasets:
+                          for dataset in input_datasets:
+                              dataset_name = dataset["name"]
+                              datatype = dataset["dataType"]
+                              value_range = dataset["valueRange"]
+                              dimensions = dataset["dimensions"]
 
-                        input_arrays = []
+                              # Handle parameter-dependent dimensions
+                              converted_dimensions = []
+                              for dim in dimensions:
+                                  if isinstance(dim, str):
+                                      dim = next(
+                                          (
+                                              p["value"]
+                                              for p in test["parameters"]
+                                              if p["name"] == dim
+                                          ),
+                                          1,
+                                      )
+                                  converted_dimensions.append(dim)
 
-                        for dataset in input_datasets:
-                            dataset_name = dataset["name"]
-                            datatype = dataset["dataType"]
-                            value_range = dataset["valueRange"]
-                            dimensions = dataset["dimensions"]
+                              dataset_shape = tuple(converted_dimensions)
 
-                            # Handle parameter-dependent dimensions
-                            converted_dimensions = []
-                            for dim in dimensions:
-                                if isinstance(dim, str):
-                                    dim = next(
-                                        (
-                                            p["value"]
-                                            for p in test["parameters"]
-                                            if p["name"] == dim
-                                        ),
-                                        1,
-                                    )
-                                converted_dimensions.append(dim)
+                              # Generate a NumPy array with the correct shape and datatype
+                              if datatype == "uint8_t":
+                                  input_array = np.random.randint(
+                                      value_range[0],
+                                      value_range[1],
+                                      size=dataset_shape,
+                                      dtype=np.uint8,
+                                  )
+                              elif datatype == "uint16_t":
+                                  input_array = np.random.randint(
+                                      value_range[0],
+                                      value_range[1],
+                                      size=dataset_shape,
+                                      dtype=np.uint16,
+                                  )
+                              elif datatype == "uint32_t":
+                                  input_array = np.random.randint(
+                                      value_range[0],
+                                      value_range[1],
+                                      size=dataset_shape,
+                                      dtype=np.uint32,
+                                  )
+                              elif datatype == "uint64_t":
+                                  input_array = np.random.randint(
+                                      value_range[0],
+                                      value_range[1],
+                                      size=dataset_shape,
+                                      dtype=np.uint64,
+                                  )
+                              elif datatype == "int8_t":
+                                  input_array = np.random.randint(
+                                      value_range[0],
+                                      value_range[1],
+                                      size=dataset_shape,
+                                      dtype=np.int8,
+                                  )
+                              elif datatype == "int16_t":
+                                  input_array = np.random.randint(
+                                      value_range[0],
+                                      value_range[1],
+                                      size=dataset_shape,
+                                      dtype=np.int16,
+                                  )
+                              elif datatype == "int32_t":
+                                  input_array = np.random.randint(
+                                      value_range[0],
+                                      value_range[1],
+                                      size=dataset_shape,
+                                      dtype=np.int32,
+                                  )
+                              elif datatype == "int64_t":
+                                  input_array = np.random.randint(
+                                      value_range[0],
+                                      value_range[1],
+                                      size=dataset_shape,
+                                      dtype=np.int64,
+                                  )
+                              elif datatype == "float":
+                                  input_array = np.random.uniform(
+                                      value_range[0], value_range[1], size=dataset_shape
+                                  ).astype(np.float32)
+                              elif datatype == "double":
+                                  input_array = np.random.uniform(
+                                      value_range[0], value_range[1], size=dataset_shape
+                                  ).astype(np.float64)
+                              else:
+                                  raise ValueError(f"unsupported datatype '{datatype}'")
 
-                            dataset_shape = tuple(converted_dimensions)
+                              input_arrays.append(input_array)
 
-                            # Generate a NumPy array with the correct shape and datatype
-                            if datatype == "uint8_t":
-                                input_array = np.random.randint(
-                                    value_range[0],
-                                    value_range[1],
-                                    size=dataset_shape,
-                                    dtype=np.uint8,
-                                )
-                            elif datatype == "uint16_t":
-                                input_array = np.random.randint(
-                                    value_range[0],
-                                    value_range[1],
-                                    size=dataset_shape,
-                                    dtype=np.uint16,
-                                )
-                            elif datatype == "uint32_t":
-                                input_array = np.random.randint(
-                                    value_range[0],
-                                    value_range[1],
-                                    size=dataset_shape,
-                                    dtype=np.uint32,
-                                )
-                            elif datatype == "uint64_t":
-                                input_array = np.random.randint(
-                                    value_range[0],
-                                    value_range[1],
-                                    size=dataset_shape,
-                                    dtype=np.uint64,
-                                )
-                            elif datatype == "int8_t":
-                                input_array = np.random.randint(
-                                    value_range[0],
-                                    value_range[1],
-                                    size=dataset_shape,
-                                    dtype=np.int8,
-                                )
-                            elif datatype == "int16_t":
-                                input_array = np.random.randint(
-                                    value_range[0],
-                                    value_range[1],
-                                    size=dataset_shape,
-                                    dtype=np.int16,
-                                )
-                            elif datatype == "int32_t":
-                                input_array = np.random.randint(
-                                    value_range[0],
-                                    value_range[1],
-                                    size=dataset_shape,
-                                    dtype=np.int32,
-                                )
-                            elif datatype == "int64_t":
-                                input_array = np.random.randint(
-                                    value_range[0],
-                                    value_range[1],
-                                    size=dataset_shape,
-                                    dtype=np.int64,
-                                )
-                            elif datatype == "float":
-                                input_array = np.random.uniform(
-                                    value_range[0], value_range[1], size=dataset_shape
-                                ).astype(np.float32)
-                            elif datatype == "double":
-                                input_array = np.random.uniform(
-                                    value_range[0], value_range[1], size=dataset_shape
-                                ).astype(np.float64)
-                            else:
-                                raise ValueError(f"unsupported datatype '{datatype}'")
+                              total_size = np.prod(dataset_shape)
+                              h_file.write(
+                                  f"extern const {datatype} {dataset_name}[{total_size}];\n"
+                              )
 
-                            input_arrays.append(input_array)
+                              # Define dataset in Source File (data.c)
+                              c_file.write(
+                                  f"const {datatype} {dataset_name}[{total_size}]"
+                                  + " = {\n"
+                              )
 
-                            total_size = np.prod(dataset_shape)
-                            h_file.write(
-                                f"extern const {datatype} {dataset_name}[{total_size}];\n"
-                            )
+                              # Write the golden result array with formatting
+                              testit_util.write_array(c_file, input_array, dataset_shape)
 
-                            # Define dataset in Source File (data.c)
-                            c_file.write(
-                                f"const {datatype} {dataset_name}[{total_size}]"
-                                + " = {\n"
-                            )
+                              c_file.write("};\n\n")
 
-                            # Write the golden result array with formatting
-                            testit_util.write_array(c_file, input_array, dataset_shape)
+                      # Output datasets are not mandatory
+                      if output_datasets:
+                          # Generate the golden results using the golden function
+                          golden_function = testit_util.dyn_load_func(
+                              test["goldenResultFunction"]["name"]
+                          )
+                          golden_results = golden_function(
+                              input_arrays, test["parameters"]
+                          )
 
-                            c_file.write("};\n\n")
+                          # Ensure golden_results is a list (it might be a single array)
+                          if testit_util.is_numpy_array(golden_results):
+                              golden_results = [golden_results]
 
-                    output_datasets = test.get("outputDataset", [])
+                          # Write the golden result
+                          for iteration, golden_result in enumerate(golden_results):
+                              output_name = output_datasets[iteration]["name"]
+                              output_shape = golden_result.shape
+                              output_datatype = output_datasets[iteration]["dataType"]
 
-                    # Ensure output_datasets is a list (it might be a dict if only one exists)
-                    if isinstance(output_datasets, dict):
-                        output_datasets = [output_datasets]
+                              total_size = np.prod(output_shape)
+                              h_file.write(
+                                  f"extern const {output_datatype} {output_name}[{total_size}];\n"
+                              )
 
-                    # Output datasets are not mandatory
-                    if output_datasets:
-                        # Generate the golden results using the golden function
-                        golden_function = testit_util.dyn_load_func(
-                            test["goldenResultFunction"]["name"]
-                        )
-                        golden_results = golden_function(
-                            input_arrays, test["parameters"]
-                        )
+                              c_file.write(
+                                  f"const {output_datatype} {output_name}[{total_size}]"
+                                  + " = {\n"
+                              )
 
-                        # Ensure golden_results is a list (it might be a single array)
-                        if testit_util.is_numpy_array(golden_results):
-                            golden_results = [golden_results]
+                              # Write the golden result array with formatting
+                              testit_util.write_array(c_file, golden_result, output_shape)
 
-                        # Write the golden result
-                        for iteration, golden_result in enumerate(golden_results):
-                            output_name = output_datasets[iteration]["name"]
-                            output_shape = golden_result.shape
-                            output_datatype = output_datasets[iteration]["dataType"]
+                              c_file.write("};\n\n")
 
-                            total_size = np.prod(output_shape)
-                            h_file.write(
-                                f"extern const {output_datatype} {output_name}[{total_size}];\n"
-                            )
-
-                            c_file.write(
-                                f"const {output_datatype} {output_name}[{total_size}]"
-                                + " = {\n"
-                            )
-
-                            # Write the golden result array with formatting
-                            testit_util.write_array(c_file, golden_result, output_shape)
-
-                            c_file.write("};\n\n")
-
-                    # Close Header File
-                    h_file.write("\n#endif // TEST_DATA_H\n")
+                      # Close Header File
+                      h_file.write("\n#endif // TEST_DATA_H\n")
             except Exception as e:
                 print(f"ERROR: {e}")
                 return False
