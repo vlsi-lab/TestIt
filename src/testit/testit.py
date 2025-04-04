@@ -249,6 +249,10 @@ class TestItEnv:
             else:
                 print_deb("Compilation successful!")
 
+            # Reset the mcu
+            self.gdb.sendline("monitor reset halt")
+            self.gdb.expect("(gdb)")
+
             # Run the testbench with gdb
             self.gdb.sendline("load")
             self.gdb.expect("(gdb)")
