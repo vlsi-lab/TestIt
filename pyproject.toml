@@ -19,7 +19,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "testitpy"
-version = "0.3"
+version = "0.4"
 authors = [
     {name = "Tommaso Terzano", email = "tommaso.terzano@gmail.com"},
 ]
