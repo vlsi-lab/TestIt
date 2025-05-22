@@ -1,5 +1,10 @@
 # Just TestIt!
 
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/2742f7fa-ac6b-46e5-bdfa-09131c2f9ccc" alt="logo"  width="400" />
+</p>
+
+
 TestIt is a python package designed to **automate full-system integration testing** using a **Software-Based Self-Test (SBST)** approach.
 While formal verification methods are highly effective for targeting individual components, their complexity grows exponentially with the size of the System-Under-Test (SUT), making them impractical for testing large scale systems, like MCUs.
 Furthermore, they do not test interactions between the hardware platform and the software stack, which is essential for validating real-world functionality.
