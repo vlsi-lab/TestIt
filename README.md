@@ -27,7 +27,7 @@ With just three requirements:
 
 #### How can you use TestIt?
 Again, very simple! Just go to TestIt's documentation at https://vlsi-lab.github.io/TestIt/.
-If you have any question or suggestions, just contact Tommaso Terzano at tommaso.terzano@gmail.com.
+If you have any question or suggestions, just contact Tommaso Terzano at tommaso.terzano@epfl.ch.
 He will be glad to connect with you and help you with any doubt you might have.
 
 ## Installation
